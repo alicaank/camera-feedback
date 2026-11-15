@@ -3,23 +3,42 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Video World Models Do Not Go Where They Are Told</title>
-  <meta name="description" content="Released camera-controlled video world models drift away from the camera path they are given. A training-free feedback loop measures the camera in the generated frames and re-aims the next commands.">
-  <meta property="og:title" content="Video World Models Do Not Go Where They Are Told">
-  <meta property="og:description" content="A training-free camera feedback loop for autoregressive video world models.">
-  <meta property="og:image" content="assets/img/fig_setup.png">
+  <title>Lost in Generation: Training-Free Re-Aiming for Camera Control in Autoregressive Video World Models</title>
+  <meta name="description" content="Lost in Generation introduces training-free re-aiming for camera control in autoregressive video world models. Explore camera paths, visual comparisons, and results on eight released models.">
+  <meta property="og:title" content="Lost in Generation: Training-Free Re-Aiming for Camera Control in Autoregressive Video World Models">
+  <meta property="og:description" content="Training-free re-aiming brings camera control back on course in autoregressive video world models.">
+  <meta property="og:image" content="https://alicaank.github.io/camera-feedback/assets/img/fig_setup.png">
+  <meta property="og:url" content="https://alicaank.github.io/camera-feedback/">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#fafbf9">
   <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://alicaank.github.io/camera-feedback/">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
 
-  <header class="masthead">
+  <nav class="site-nav" aria-label="Page sections">
+    <div class="wrap-wide nav-inner">
+      <a class="wordmark" href="#top">
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M5 26 12 19 9 11 27 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 4"/><path d="m5 26 8-5 5-9 9-7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5" cy="26" r="3" fill="currentColor"/><circle cx="27" cy="5" r="3" fill="currentColor"/></svg>
+        <span>Lost in Generation</span>
+      </a>
+      <div class="section-links">
+        <a href="#watch">Demo</a>
+        <a href="#examples">Examples</a>
+        <a href="#method">Method</a>
+        <a href="#results">Results</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="masthead" id="top">
     <div class="wrap">
       <p class="venue" data-config="venue">CVPR 2027 submission</p>
       <h1 class="title">
-        <span class="title-main">Video World Models Do Not Go Where They Are Told</span>
-        <span class="title-sub">A Training-Free Camera Feedback Loop</span>
+        <span class="title-main">Lost in Generation<span class="title-colon">:</span></span>
+        <span class="title-sub">Training-Free Re-Aiming for Camera Control<br class="title-break"> in Autoregressive Video World Models</span>
       </h1>
       <p class="authors" data-config="authors">Anonymous authors</p>
       <nav class="links" aria-label="Paper links">
@@ -36,7 +55,14 @@
     <!-- The player: real scenes from the paper, the camera paths from above and what every run generated -->
     <section class="hero" id="watch" aria-label="Rollouts">
       <div class="wrap-wide">
-        <p class="hero-lead">Told to follow the dashed path, released video world models end up somewhere else. Measuring the camera in the generated frames and re-aiming the next commands brings them back.</p>
+        <div class="demo-intro">
+          <div>
+            <p class="eyebrow">See the difference</p>
+            <h2>Camera control, back on course.</h2>
+          </div>
+          <p class="hero-lead">Video world models drift from their planned camera paths. Measuring the generated camera pose and re-aiming the next commands brings them back.</p>
+        </div>
+        <div class="demo-panel">
         <div class="picker" role="tablist" aria-label="Choose a scene"></div>
 
         <div class="stage">
@@ -94,15 +120,7 @@
           <li><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4" class="lg-start"/></svg>Start</li>
           <li><svg width="12" height="12" aria-hidden="true"><rect x="2" y="2" width="8" height="8" class="lg-mark"/></svg>Frame 480</li>
         </ul>
-      </div>
-    </section>
-
-    <section class="prose" aria-labelledby="abstract">
-      <div class="wrap">
-        <h2 id="abstract">Abstract</h2>
-        <p>Most camera-controlled video world models generate a scene one chunk at a time and condition each chunk on the pose the model was told to reach, not the pose it reached. We measure this gap on six released models. Their camera paths are 0.46 to 4.0 times as long as planned, and on two models the camera is on average more than a scene depth from its target. Standard metrics miss this because they align the path to the plan before comparing, which removes 75 to 95% of the error.</p>
-        <p>We propose a training-free wrapper that feeds the measured camera back into the commands. After each chunk, a geometry model measures the camera in the generated frames, and the next commands are re-aimed from there back to the plan. Re-aiming alone lowers the position error on all six models: by 3 to 23 times on five, and slightly on the sixth, which moves too little.</p>
-        <p>Feedback can also fail: a model that moves further than commanded keeps overshooting. A simple model of the loop explains this failure and leads to Rectified Gain Compensation (RGC), which estimates the response online and shrinks the commands. RGC lowers the error a further 2.5 and 1.7 times on the two overshooting models and changes it by −6 to +30% on the others. On two more models, Voyager already follows its plan, and VMem's error falls 2.5 times once its memory also receives the measured poses. The generated frames move closer to the real view at the planned pose, and WorldScore rises on five of six models, although 3D consistency falls on four, by up to 0.10. Apart from VMem, the wrapper needs only generated frames and camera input, and has no tuned parameters.</p>
+        </div>
       </div>
     </section>
 
@@ -216,9 +234,9 @@
       <div class="wrap">
         <h2 id="bibtex">Citation</h2>
         <div class="bib">
-          <pre><code id="bibtex-text">@inproceedings{anonymous2027feedback,
-  title     = {Video World Models Do Not Go Where They Are Told:
-               A Training-Free Camera Feedback Loop},
+          <pre><code id="bibtex-text">@inproceedings{anonymous2027lost,
+  title     = {Lost in Generation: Training-Free Re-Aiming for Camera Control
+               in Autoregressive Video World Models},
   author    = {Anonymous},
   booktitle = {Under review},
   year      = {2027}
@@ -231,7 +249,8 @@
 
   <footer class="footer">
     <div class="wrap">
-      <p>Numbers and figures are taken from the paper. Page source on GitHub.</p>
+      <a class="footer-brand" href="#top">Lost in Generation</a>
+      <p>Numbers and figures are taken from the paper. <a href="https://github.com/alicaank/camera-feedback">Page source on GitHub</a>.</p>
     </div>
   </footer>
 

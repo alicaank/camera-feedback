@@ -1,6 +1,6 @@
-# Project page
+# Lost in Generation
 
-Static page for "Video World Models Do Not Go Where They Are Told: A Training-Free Camera Feedback Loop". No build step, no external requests: fonts, figures and data are all in this folder.
+Static page for "Lost in Generation: Training-Free Re-Aiming for Camera Control in Autoregressive Video World Models". No build step, no external requests: fonts, figures and data are all in this folder.
 
 ## Deploy on GitHub Pages
 
