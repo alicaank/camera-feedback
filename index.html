@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Video World Models Do Not Go Where They Are Told</title>
+  <meta name="description" content="Released camera-controlled video world models drift away from the camera path they are given. A training-free feedback loop measures the camera in the generated frames and re-aims the next commands.">
+  <meta property="og:title" content="Video World Models Do Not Go Where They Are Told">
+  <meta property="og:description" content="A training-free camera feedback loop for autoregressive video world models.">
+  <meta property="og:image" content="assets/img/fig_setup.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="masthead">
+    <div class="wrap">
+      <p class="venue" data-config="venue">CVPR 2027 submission</p>
+      <h1 class="title">
+        <span class="title-main">Video World Models Do Not Go Where They Are Told</span>
+        <span class="title-sub">A Training-Free Camera Feedback Loop</span>
+      </h1>
+      <p class="authors" data-config="authors">Anonymous authors</p>
+      <nav class="links" aria-label="Paper links">
+        <a class="link" data-link="paper" href="#">Paper</a>
+        <a class="link" data-link="supplement" href="#">Supplement</a>
+        <a class="link" data-link="arxiv" href="#">arXiv</a>
+        <a class="link" data-link="code" href="#">Code</a>
+        <a class="link" href="#bibtex">BibTeX</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- The player: real scenes from the paper, the camera paths from above and what every run generated -->
+    <section class="hero" id="watch" aria-label="Rollouts">
+      <div class="wrap-wide">
+        <p class="hero-lead">Told to follow the dashed path, released video world models end up somewhere else. Measuring the camera in the generated frames and re-aiming the next commands brings them back.</p>
+        <div class="picker" role="tablist" aria-label="Choose a scene"></div>
+
+        <div class="stage">
+          <figure class="map">
+            <svg class="map-svg" viewBox="0 0 1000 1000" role="img" aria-labelledby="map-title">
+              <title id="map-title">Camera paths seen from above</title>
+              <defs>
+                <pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse">
+                  <path d="M100 0H0V100" fill="none" class="grid-line"/>
+                </pattern>
+                <clipPath id="map-clip"><rect x="0" y="0" width="1000" height="1000" rx="28"/></clipPath>
+              </defs>
+              <g clip-path="url(#map-clip)">
+                <rect class="map-bg" x="0" y="0" width="1000" height="1000"/>
+                <rect x="0" y="0" width="1000" height="1000" fill="url(#grid)"/>
+                <g class="map-paths"></g>
+                <g class="map-live"></g>
+              </g>
+            </svg>
+            <div class="err-strip" hidden></div>
+            <figcaption class="map-caption"><span class="readout"></span></figcaption>
+          </figure>
+
+          <div class="screens">
+            <div class="screen-grid"></div>
+            <div class="wipe" hidden>
+              <div class="wipe-media">
+                <span class="wipe-line" aria-hidden="true"></span>
+                <span class="tag tag-open w-tag-l">Released model</span>
+                <span class="tag tag-ours w-tag-r">Re-aim + RGC</span>
+                <figure class="inset"><figcaption class="tag tag-target">Recording</figcaption></figure>
+                <input class="wipe-range" type="range" min="0" max="100" value="50" aria-label="Move the divide between the released model and ours">
+              </div>
+            </div>
+            <div class="transport">
+              <button class="play" type="button" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"/></svg><svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 2.5h3v11h-3zM9.5 2.5h3v11h-3z"/></svg><span class="play-label">Play</span></button>
+              <div class="scrub-wrap">
+                <input class="scrub" type="range" min="0" max="4" step="1" value="0" aria-label="Frame">
+                <div class="scrub-ticks" aria-hidden="true"></div>
+              </div>
+              <span class="time" aria-live="off"></span>
+              <div class="views" role="group" aria-label="View">
+                <button class="view-btn" type="button" data-view="grid" aria-pressed="true">Side by side</button>
+                <button class="view-btn" type="button" data-view="wipe" aria-pressed="false">Wipe</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ul class="legend" aria-label="Legend">
+          <li><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-plan"/></svg>Planned path</li>
+          <li><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-open"/></svg>Open loop</li>
+          <li><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-reaim"/></svg>Re-aim alone</li>
+          <li><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-ours"/></svg>Re-aim + RGC</li>
+          <li><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4" class="lg-start"/></svg>Start</li>
+          <li><svg width="12" height="12" aria-hidden="true"><rect x="2" y="2" width="8" height="8" class="lg-mark"/></svg>Frame 480</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="prose" aria-labelledby="abstract">
+      <div class="wrap">
+        <h2 id="abstract">Abstract</h2>
+        <p>Most camera-controlled video world models generate a scene one chunk at a time and condition each chunk on the pose the model was told to reach, not the pose it reached. We measure this gap on six released models. Their camera paths are 0.46 to 4.0 times as long as planned, and on two models the camera is on average more than a scene depth from its target. Standard metrics miss this because they align the path to the plan before comparing, which removes 75 to 95% of the error.</p>
+        <p>We propose a training-free wrapper that feeds the measured camera back into the commands. After each chunk, a geometry model measures the camera in the generated frames, and the next commands are re-aimed from there back to the plan. Re-aiming alone lowers the position error on all six models: by 3 to 23 times on five, and slightly on the sixth, which moves too little.</p>
+        <p>Feedback can also fail: a model that moves further than commanded keeps overshooting. A simple model of the loop explains this failure and leads to Rectified Gain Compensation (RGC), which estimates the response online and shrinks the commands. RGC lowers the error a further 2.5 and 1.7 times on the two overshooting models and changes it by −6 to +30% on the others. On two more models, Voyager already follows its plan, and VMem's error falls 2.5 times once its memory also receives the measured poses. The generated frames move closer to the real view at the planned pose, and WorldScore rises on five of six models, although 3D consistency falls on four, by up to 0.10. Apart from VMem, the wrapper needs only generated frames and camera input, and has no tuned parameters.</p>
+      </div>
+    </section>
+
+    <section class="prose" id="examples" aria-labelledby="examples-h">
+      <div class="wrap">
+        <h2 id="examples-h">Examples</h2>
+        <p class="lede">Each model starts from the same first frame and follows the same planned camera path. Drag across a frame to compare the released model with ours; the recording at the planned pose is in the corner.</p>
+      </div>
+      <div class="wrap-wide">
+        <div class="ex-grid"></div>
+      </div>
+    </section>
+
+    <section class="prose sim" id="sim" aria-labelledby="sim-h">
+      <div class="wrap">
+        <h2 id="sim-h">Try the loop on a toy camera</h2>
+        <p>A made-up camera follows a curved plan, generated in chunks of 24 frames. Change how it responds to its commands and compare the three ways of steering it. Dots mark where the camera was measured; thin lines are the paths re-aimed back to the plan.</p>
+      </div>
+      <div class="wrap-wide">
+        <div class="sim-presets" role="radiogroup" aria-label="Kind of model"></div>
+        <div class="sim-stage">
+          <div class="sim-left">
+            <svg class="sim-map" viewBox="0 0 1000 560" role="img" aria-label="Toy camera paths seen from above"></svg>
+            <div class="sim-transport">
+              <button class="play sim-play" type="button" aria-pressed="false"><svg class="i-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"/></svg><svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 2.5h3v11h-3zM9.5 2.5h3v11h-3z"/></svg><span class="play-label">Play</span></button>
+              <input class="sim-scrub scrub" type="range" min="0" max="480" step="1" value="480" aria-label="Frame of the toy rollout">
+            </div>
+            <div class="sim-toggles" role="group" aria-label="Show or hide">
+              <button class="sim-toggle" type="button" data-arm="open" aria-pressed="true"><i class="key key-open"></i>Open loop</button>
+              <button class="sim-toggle" type="button" data-arm="reaim" aria-pressed="true"><i class="key key-reaim"></i>Re-aim</button>
+              <button class="sim-toggle" type="button" data-arm="rgc" aria-pressed="true"><i class="key key-ours"></i>Re-aim + RGC</button>
+            </div>
+            <p class="sim-note">A toy in the plane, not one of the eight models. Distances are shares of the planned path length.</p>
+          </div>
+          <div class="sim-right">
+            <label class="slider" for="sim-gain"><span>Gain: distance moved per unit commanded <output></output></span>
+              <input id="sim-gain" type="range" min="0.3" max="2.4" step="0.05" value="1.6"></label>
+            <label class="slider" for="sim-turn"><span>Turn: angle between commanded and actual motion <output></output></span>
+              <input id="sim-turn" type="range" min="-20" max="20" step="1" value="0"></label>
+            <label class="slider" for="sim-noise"><span>Noise of the camera measurement <output></output></span>
+              <input id="sim-noise" type="range" min="0" max="0.3" step="0.01" value="0.01"></label>
+            <h3 class="sim-sub">Mean distance from the plan</h3>
+            <div class="sim-bars"></div>
+            <p class="sim-ghat"></p>
+            <h3 class="sim-sub">Distance from the plan per frame, log scale</h3>
+            <svg class="sim-err" viewBox="0 0 400 170" role="img" aria-label="Distance from the plan per frame, as a share of the path length"></svg>
+          </div>
+        </div>
+      </div>
+      <div class="wrap">
+        <h3 class="why">Why RGC</h3>
+        <p>Re-aiming asks for exactly the motion that is missing. A model that moves further than told then lands on the other side of the plan, is corrected, and crosses again; the magnifier shows the green path doing this. Above a gain of two the crossings grow and re-aiming alone diverges.</p>
+        <p>RGC estimates how strongly the model responds and asks for less. Its estimate is never allowed below one, because dividing by a smaller gain would give a model that moves too little ever larger commands. On SANA-WM, the released model that overshoots most, RGC brings the camera path from 5.6 back to 1.5 times the plan length and lowers the error a further 2.5 times.</p>
+      </div>
+    </section>
+
+    <section class="prose" aria-labelledby="method">
+      <div class="wrap">
+        <h2 id="method">How it works</h2>
+        <p>The world model stays frozen. We only read the frames it generates and write the camera input it receives. After every chunk, three things happen.</p>
+        <ol class="steps">
+          <li>
+            <h3>Measure</h3>
+            <p>A geometry model estimates where the camera is from the generated frames. Its scale is fixed once, from the first frame, so a camera that moved three times too far still shows up as wrong.</p>
+          </li>
+          <li>
+            <h3>Re-aim</h3>
+            <p>A target path starts at the measured camera and rejoins the plan by the end of the next chunk. We send the generator the same motion, written from the pose it believes it is at.</p>
+          </li>
+          <li>
+            <h3>Compensate</h3>
+            <p>Some models move further than they are told and would overshoot the corrected path again and again. RGC estimates this response during the rollout and shrinks the commands. It never enlarges them.</p>
+          </li>
+        </ol>
+      </div>
+      <figure class="wide-figure wrap-wide">
+        <a class="zoom" href="assets/img/fig_setup.png"><img src="assets/img/fig_setup.png" alt="The loop around a frozen world model: generate a chunk, measure the camera, re-aim the next commands. Right panels: open loop keeps commanding the plan, our commands lead back to it, and RGC shrinks them when the model overshoots." loading="lazy" width="2402" height="820"></a>
+        <figcaption>The loop and its notation. Open loop keeps commanding the plan (red); our commands lead back to it (blue).</figcaption>
+      </figure>
+    </section>
+
+    <section class="results" aria-labelledby="results">
+      <div class="wrap">
+        <h2 id="results">Results on eight released models</h2>
+        <p class="lede">Mean over 52 DL3DV scenes (480 frames) and 30 RealEstate10K clips (240 frames), measured without aligning the camera path to the plan. Pick a metric.</p>
+      </div>
+      <div class="wrap-wide">
+        <div class="chart-controls" role="radiogroup" aria-label="Metric"></div>
+        <div class="chart" aria-describedby="chart-note"></div>
+        <p id="chart-note" class="chart-note"></p>
+        <details class="table-details">
+          <summary>Show all numbers</summary>
+          <div class="table-scroll"><table class="results-table"></table></div>
+          <p class="table-note">WorldScore image aspects were scored for open loop and the full method only. VMem uses feedback through its pose memory instead of re-aiming alone.</p>
+        </details>
+      </div>
+    </section>
+
+    <section class="prose" aria-labelledby="drift">
+      <div class="wrap">
+        <h2 id="drift">Feedback keeps the error low</h2>
+        <p>Run as usual, the camera error grows over the rollout, because every chunk starts from where the model was told to be rather than where it is. With feedback it stays far lower and grows more slowly.</p>
+      </div>
+      <figure class="wide-figure wrap-wide">
+        <a class="zoom" href="assets/img/fig_time_compact.png"><img src="assets/img/fig_time_compact.png" alt="Position error per frame for six models on a shared log axis: open loop rises over the rollout, both of our variants stay one to two orders of magnitude lower." loading="lazy" width="2407" height="399"></a>
+        <figcaption>Position error per frame: median over scenes (line) and middle half (band).</figcaption>
+      </figure>
+    </section>
+
+    <section class="prose" aria-labelledby="bibtex">
+      <div class="wrap">
+        <h2 id="bibtex">Citation</h2>
+        <div class="bib">
+          <pre><code id="bibtex-text">@inproceedings{anonymous2027feedback,
+  title     = {Video World Models Do Not Go Where They Are Told:
+               A Training-Free Camera Feedback Loop},
+  author    = {Anonymous},
+  booktitle = {Under review},
+  year      = {2027}
+}</code></pre>
+          <button class="copy" type="button" data-copy="#bibtex-text">Copy BibTeX</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p>Numbers and figures are taken from the paper. Page source on GitHub.</p>
+    </div>
+  </footer>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/videos.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/player.js"></script>
+  <script src="assets/js/sim.js"></script>
+  <script src="assets/js/results.js"></script>
+  <script src="assets/js/examples.js"></script>
+</body>
+</html>
