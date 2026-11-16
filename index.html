@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Lost in Generation: Training-Free Re-Aiming for Camera Control in Autoregressive Video World Models</title>
-  <meta name="description" content="Lost in Generation introduces training-free re-aiming for camera control in autoregressive video world models. Explore camera paths, visual comparisons, and results on eight released models.">
+  <meta name="description" content="Training-free camera feedback for autoregressive video world models, evaluated on eight released models.">
   <meta property="og:title" content="Lost in Generation: Training-Free Re-Aiming for Camera Control in Autoregressive Video World Models">
-  <meta property="og:description" content="Training-free re-aiming brings camera control back on course in autoregressive video world models.">
+  <meta property="og:description" content="Training-free camera feedback for autoregressive video world models.">
   <meta property="og:image" content="https://alicaank.github.io/camera-feedback/assets/img/fig_setup.png">
   <meta property="og:url" content="https://alicaank.github.io/camera-feedback/">
   <meta property="og:type" content="website">
@@ -31,7 +31,7 @@
         <a href="#method">Method</a>
         <a href="#examples">Examples</a>
         <a href="#results">Results</a>
-        <a href="#sim">Try the loop</a>
+        <a href="#sim">Simulation</a>
       </div>
     </div>
     <div class="reading-progress" aria-hidden="true"></div>
@@ -47,13 +47,12 @@
       </h1>
       <p class="authors" data-config="authors">Anonymous authors</p>
       <nav class="links" aria-label="Paper links">
-        <a class="link link-primary" href="#watch"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 8 6-8 6z"/></svg>Explore the demo</a>
+        <a class="link link-primary" href="#watch"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 8 6-8 6z"/></svg>View demo</a>
         <a class="link" data-link="paper" href="#">Paper</a>
         <a class="link" data-link="arxiv" href="#">arXiv</a>
         <a class="link" data-link="code" href="#">Code</a>
         <a class="link" href="#bibtex"><span aria-hidden="true">{ }</span>BibTeX</a>
       </nav>
-      <p class="masthead-note">Measure the camera you generated. Re-aim the next step.</p>
     </div>
   </header>
 
@@ -64,10 +63,10 @@
         <div class="demo-panel">
         <div class="demo-intro">
           <div>
-            <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span>Interactive comparison</p>
-            <h2>Bring the camera back on course.</h2>
+            <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span>Demo</p>
+            <h2>Camera control examples</h2>
           </div>
-          <p class="hero-lead">Drag the divider to compare. Scrub the trajectory to explore. Same model, same planned path, with camera feedback.</p>
+          <p class="hero-lead">Drag the divider to compare outputs, or select a frame on the camera trajectory.</p>
         </div>
         <div class="picker" role="tablist" aria-label="Choose a scene"></div>
         <div class="scene-summary">
@@ -158,37 +157,37 @@
 
     <section class="prose method-section" id="method" aria-labelledby="method-h">
       <div class="wrap section-heading">
-        <p class="eyebrow">01 / The idea</p>
-        <h2 id="method-h">A small loop.<br>A more faithful camera.</h2>
-        <p>The world model stays frozen. We read the frames it generates and rewrite the next camera commands. After every chunk, three things happen.</p>
+        <p class="eyebrow">Method</p>
+        <h2 id="method-h">Camera feedback</h2>
+        <p>After each generated chunk, we estimate the camera pose and use it to re-aim the next commands. The generator weights remain fixed.</p>
       </div>
       <div class="wrap method-overview">
         <ol class="steps">
           <li>
-            <h3>Measure</h3>
-            <p>A geometry model estimates where the camera is from the generated frames. Its scale is fixed once, from the first frame, so a camera that moved three times too far still shows up as wrong.</p>
+            <h3>Estimate the camera pose</h3>
+            <p>A geometry model estimates camera poses from the generated frames. The estimates use a fixed scale calibrated from the first frame.</p>
           </li>
           <li>
-            <h3>Re-aim</h3>
-            <p>A target path starts at the measured camera and rejoins the plan by the end of the next chunk. We send the generator the same motion, written from the pose it believes it is at.</p>
+            <h3>Re-aim the next chunk</h3>
+            <p>We construct a path from the estimated pose to the planned pose at the end of the next chunk, then express its motion in the generator's assumed camera frame.</p>
           </li>
           <li>
-            <h3>Compensate</h3>
-            <p>Some models move further than they are told and would overshoot the corrected path again and again. RGC estimates this response during the rollout and shrinks the commands. It never enlarges them.</p>
+            <h3>Compensate for overshoot</h3>
+            <p>Rectified Gain Compensation (RGC) estimates the motion gain online and reduces command magnitude when the generator overshoots. Commands are never amplified.</p>
           </li>
         </ol>
       </div>
       <figure class="wide-figure wrap-wide">
         <a class="zoom" href="assets/img/fig_setup.png"><img src="assets/img/fig_setup.png" alt="The loop around a frozen world model: generate a chunk, measure the camera, re-aim the next commands. Right panels: open loop keeps commanding the plan, our commands lead back to it, and RGC shrinks them when the model overshoots." loading="lazy" width="2402" height="820"></a>
-        <figcaption>The loop and its notation. Open loop keeps commanding the plan (red); our commands lead back to it (blue).</figcaption>
+        <figcaption>Feedback loop and camera commands. Open-loop commands are shown in red; corrected commands are shown in blue.</figcaption>
       </figure>
     </section>
 
     <section class="prose" id="examples" aria-labelledby="examples-h">
       <div class="wrap section-heading">
-        <p class="eyebrow">02 / Visual comparisons</p>
-        <h2 id="examples-h">Different worlds.<br>The same course correction.</h2>
-        <p class="lede">Explore every frame sheet from the paper, including a case where feedback fails. Drag to compare; the recording at the planned pose sits in the corner.</p>
+        <p class="eyebrow">Experiments</p>
+        <h2 id="examples-h">Qualitative comparisons</h2>
+        <p class="lede">Drag the divider to compare each released model with re-aim + RGC. The inset shows the recorded view at the planned pose. The gallery includes a failure case.</p>
       </div>
       <div class="wrap-wide">
         <div class="gallery-toolbar">
@@ -202,20 +201,20 @@
 
     <section class="results" id="results" aria-labelledby="results-h">
       <div class="wrap section-heading">
-        <p class="eyebrow">03 / Measured, without alignment</p>
-        <h2 id="results-h">The camera path<br>tells the story.</h2>
-        <p class="lede">Eight released models. Mean over 52 DL3DV scenes (480 frames) or 30 RealEstate10K clips (240 frames), without aligning the generated camera path to the plan.</p>
+        <p class="eyebrow">Evaluation</p>
+        <h2 id="results-h">Quantitative results</h2>
+        <p class="lede">We evaluate six models on 52 DL3DV scenes (480 frames) and two on 30 RealEstate10K clips (240 frames). Position error is measured without aligning the trajectory to the plan.</p>
       </div>
       <div class="wrap-wide">
         <div class="benchmark-highlights" aria-label="Selected mean position error reductions"></div>
         <p class="benchmark-scope">Selected DL3DV results: mean position error over 52 scenes, full method versus open loop.</p>
         <div class="chart-panel">
-        <div class="chart-panel-heading"><h3>Compare all eight models</h3><span>Choose a metric below</span></div>
+        <div class="chart-panel-heading"><h3>Results by model</h3></div>
         <div class="chart-controls" role="radiogroup" aria-label="Metric"></div>
         <div class="chart" aria-describedby="chart-note"></div>
         <p id="chart-note" class="chart-note"></p>
         <details class="table-details">
-          <summary>Show all numbers</summary>
+          <summary>Full results table</summary>
           <div class="table-scroll"><table class="results-table"></table></div>
           <p class="table-note">WorldScore image aspects were scored for open loop and the full method only. VMem uses feedback through its pose memory instead of re-aiming alone.</p>
         </details>
@@ -225,21 +224,21 @@
 
     <section class="prose drift-section" aria-labelledby="drift">
       <div class="wrap section-heading">
-        <p class="eyebrow">Across the rollout</p>
-        <h2 id="drift">Less drift.<br>Chunk after chunk.</h2>
-        <p>Open-loop error grows as each chunk starts from where the model was told to be. Feeding back the measured pose keeps the camera error far lower and slows its growth.</p>
+        <p class="eyebrow">Rollout analysis</p>
+        <h2 id="drift">Position error over time</h2>
+        <p>In open loop, each new chunk is conditioned on the commanded pose, even when the generated camera has drifted. Camera feedback reduces the resulting accumulation of position error.</p>
       </div>
       <figure class="wide-figure wrap-wide">
-        <a class="zoom" href="assets/img/fig_time_compact.png"><img src="assets/img/fig_time_compact.png" alt="Position error per frame for six models on a shared log axis: open loop rises over the rollout, both of our variants stay one to two orders of magnitude lower." loading="lazy" width="2407" height="399"></a>
+        <a class="zoom" href="assets/img/fig_time_compact.png"><img src="assets/img/fig_time_compact.png" alt="Position error over time for six models, comparing open loop, re-aiming, and re-aim + RGC on a shared logarithmic axis." loading="lazy" width="2407" height="399"></a>
         <figcaption>Position error per frame: median over scenes (line) and middle half (band).</figcaption>
       </figure>
     </section>
 
     <section class="prose sim" id="sim" aria-labelledby="sim-h">
       <div class="wrap section-heading">
-        <p class="eyebrow">04 / Explore the feedback</p>
-        <h2 id="sim-h">What happens<br>when a model overshoots?</h2>
-        <p>A toy camera follows a curved plan in chunks of 24 frames. Change its response and see when re-aiming works, when it oscillates, and how RGC changes the outcome.</p>
+        <p class="eyebrow">Analysis</p>
+        <h2 id="sim-h">Feedback simulation</h2>
+        <p>A 2D camera follows a planned path in 24-frame chunks. Adjust the motion gain, direction error, and measurement noise to compare open loop, re-aiming, and RGC.</p>
       </div>
       <div class="wrap-wide">
         <div class="sim-presets" role="radiogroup" aria-label="Kind of model"></div>
@@ -255,7 +254,7 @@
               <button class="sim-toggle" type="button" data-arm="reaim" aria-pressed="true"><i class="key key-reaim"></i>Re-aim</button>
               <button class="sim-toggle" type="button" data-arm="rgc" aria-pressed="true"><i class="key key-ours"></i>Re-aim + RGC</button>
             </div>
-            <p class="sim-note">A toy in the plane, not one of the eight models. Distances are shares of the planned path length.</p>
+            <p class="sim-note">2D simulation; distances are normalized by the planned path length.</p>
           </div>
           <div class="sim-right">
             <label class="slider" for="sim-gain"><span>Gain: distance moved per unit commanded <output></output></span>
@@ -273,15 +272,15 @@
         </div>
       </div>
       <div class="wrap">
-        <h3 class="why">Why RGC</h3>
-        <p>Re-aiming asks for exactly the motion that is missing. A model that moves further than told then lands on the other side of the plan, is corrected, and crosses again; the magnifier shows the green path doing this. Above a gain of two the crossings grow and re-aiming alone diverges.</p>
-        <p>RGC estimates how strongly the model responds and asks for less. Its estimate is never allowed below one, because dividing by a smaller gain would give a model that moves too little ever larger commands. On SANA-WM, the released model that overshoots most, RGC brings the camera path from 5.6 back to 1.5 times the plan length and lowers the error a further 2.5 times.</p>
+        <h3 class="why">Effect of motion gain</h3>
+        <p>Re-aiming corrects the difference between the measured pose and the plan. When the motion gain exceeds one, the correction can overshoot and produce oscillation. In this simplified model, re-aiming becomes unstable above a gain of two.</p>
+        <p>RGC divides commands by an online gain estimate, bounded below by one. This reduces overshoot without increasing commands for models that move too little. On SANA-WM, RGC reduces the generated-to-planned path-length ratio from 5.6 to 1.5 and gives a further 2.5× reduction in position error.</p>
       </div>
     </section>
 
     <section class="prose citation-section" aria-labelledby="bibtex">
       <div class="wrap citation-layout">
-        <div><p class="eyebrow">Reference this work</p>
+        <div><p class="eyebrow">BibTeX</p>
         <h2 id="bibtex">Citation</h2>
         <p>Lost in Generation<br><span>CVPR 2027 submission · Anonymous authors</span></p></div>
         <div class="bib">
@@ -316,7 +315,7 @@
   <script src="assets/js/player.js?v=comparison-2"></script>
   <script src="assets/js/sim.js"></script>
   <script src="assets/js/results.js"></script>
-  <script src="assets/js/examples.js?v=presentation-1"></script>
+  <script src="assets/js/examples.js?v=copy-3"></script>
   <script src="assets/js/presentation.js?v=2"></script>
 </body>
 </html>

@@ -19,7 +19,7 @@
     const identity = el("div", {}, head);
     el("h3", { text: x.model }, identity);
     el("span", { class: "ex-scene", text: `Scene ${x.scene}` }, identity);
-    el("span", { class: "ex-factor", text: x.worse ? "Feedback fails here" : `${x.factor}× lower camera error` }, head);
+    el("span", { class: "ex-factor", text: x.worse ? "Higher position error" : `${x.factor}× lower position error` }, head);
 
     // the wipe
     const media = el("div", { class: "wipe-media ex-wipe" }, card);
