@@ -12,6 +12,40 @@ const V = window.PAGE_VIDEOS || {};
 const SVG = "http://www.w3.org/2000/svg";
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+// Match the downloaded image resolution to its displayed size and device pixel ratio.
+const frameImages = window.PAGE_FRAME_IMAGES || {};
+let frameSizingPending = false;
+function updateFrameSizes() {
+  if (frameSizingPending) return;
+  frameSizingPending = true;
+  requestAnimationFrame(() => {
+    frameSizingPending = false;
+    document.querySelectorAll("img[data-frame-image]").forEach((img) => {
+      const width = Math.ceil(img.getBoundingClientRect().width);
+      if (width > 0) img.sizes = width + "px";
+    });
+  });
+}
+function setFrameImage(img, src, fallbackWidth = 640) {
+  const info = frameImages[src];
+  if (info) {
+    img.width = info.width;
+    img.height = info.height;
+    img.sizes = Math.ceil(img.getBoundingClientRect().width || fallbackWidth) + "px";
+    img.srcset = info.srcset;
+    img.dataset.frameImage = "";
+    updateFrameSizes();
+  } else {
+    img.removeAttribute("srcset");
+    img.removeAttribute("sizes");
+    delete img.dataset.frameImage;
+  }
+  img.src = src;
+  return img;
+}
+window.addEventListener("resize", updateFrameSizes);
+document.addEventListener("fullscreenchange", updateFrameSizes);
+
 function el(tag, attrs = {}, parent) {
   const node = tag.startsWith("svg:") ? document.createElementNS(SVG, tag.slice(4)) : document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {

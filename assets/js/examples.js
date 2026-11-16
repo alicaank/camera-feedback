@@ -23,14 +23,14 @@
 
     // the wipe
     const media = el("div", { class: "wipe-media ex-wipe" }, card);
-    const img = (row, f, cls) => el("img", { src: x.frames[row][f], class: cls, alt: "", loading: "lazy", decoding: "async", width: 640, height: 370 }, media);
+    const img = (row, f, cls) => setFrameImage(el("img", { class: cls, alt: "", loading: "lazy", decoding: "async" }, media), x.frames[row][f]);
     const under = img("open", last, "w-under");
     const over = img("ours", last, "w-over");
     el("span", { class: "wipe-line", "aria-hidden": "true" }, media);
     el("span", { class: "tag tag-open w-tag-l", text: "Released model" }, media);
     el("span", { class: "tag tag-ours w-tag-r", text: "Re-aim + RGC" }, media);
     const inset = el("figure", { class: "inset" }, media);
-    const rec = el("img", { src: x.frames.target[last], alt: "", loading: "lazy", decoding: "async" }, inset);
+    const rec = setFrameImage(el("img", { alt: "", loading: "lazy", decoding: "async" }, inset), x.frames.target[last], 160);
     el("figcaption", { class: "tag tag-target", text: "Recording" }, inset);
     const range = el("input", { class: "wipe-range", type: "range", min: 0, max: 100, value: 50, "aria-label": `${x.model}: move the divide between the released model and ours` }, media);
     range.addEventListener("input", () => media.style.setProperty("--cut", range.value + "%"));
@@ -40,7 +40,7 @@
     const chips = el("div", { class: "ex-frames", role: "radiogroup", "aria-label": `${x.model}: frame` }, bar);
     el("span", { class: "ex-frames-label", text: "Frame" }, chips);
     const show = (f) => {
-      under.src = x.frames.open[f]; over.src = x.frames.ours[f]; rec.src = x.frames.target[f];
+      setFrameImage(under, x.frames.open[f]); setFrameImage(over, x.frames.ours[f]); setFrameImage(rec, x.frames.target[f], 160);
       const label = `${x.model}, frame ${x.keyframes[f]}`;
       under.alt = `${label}: released model`; over.alt = `${label}: with our feedback`; rec.alt = `${label}: recording at the planned pose`;
       chips.querySelectorAll("button").forEach((b, i) => b.setAttribute("aria-checked", String(i === f)));
@@ -64,7 +64,7 @@
         for (const r of ROWS) {
           const row = el("div", { class: `ex-row ex-row-${r.key}` }, strip);
           el("span", { class: "ex-row-label", text: r.label }, row);
-          x.frames[r.key].forEach((src, i) => el("img", { src, alt: `${x.model}, frame ${x.keyframes[i]}: ${r.label.toLowerCase()}`, loading: "lazy", decoding: "async" }, row));
+          x.frames[r.key].forEach((src, i) => setFrameImage(el("img", { alt: `${x.model}, frame ${x.keyframes[i]}: ${r.label.toLowerCase()}`, loading: "lazy", decoding: "async" }, row), src, 120));
         }
       }
       strip.hidden = !open;
@@ -87,6 +87,7 @@
     const shown = activeModel === "all" && !expanded ? matching.slice(0, 4) : matching;
     const visible = new Set(shown.map(({ i }) => i));
     cards.forEach((card, i) => { card.hidden = !visible.has(i); });
+    updateFrameSizes();
     filters.querySelectorAll("button").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.model === activeModel)));
     count.textContent = `${shown.length} of ${matching.length} scenes`;
     moreButton.hidden = activeModel !== "all" || matching.length <= 4;

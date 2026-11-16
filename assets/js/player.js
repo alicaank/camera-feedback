@@ -67,7 +67,7 @@
   scenes.forEach((s, i) => {
     const b = el("button", { class: "pick" + (s.worst ? " pick-worst" : ""), role: "tab", type: "button", "aria-label": `${s.model}, scene ${s.scene}` }, picker);
     const thumbnail = s.frames?.target?.at(-1) || s.video?.posters?.target;
-    if (thumbnail) el("img", { class: "pick-thumbnail", src: thumbnail, alt: "", width: 64, height: 46, decoding: "async" }, b);
+    if (thumbnail) setFrameImage(el("img", { class: "pick-thumbnail", alt: "", width: 64, height: 46, decoding: "async", loading: "lazy" }, b), thumbnail, 56);
     const copy = el("span", { class: "pick-copy" }, b);
     el("span", { class: "pick-model", text: s.model }, copy);
     const detail = el("span", { class: "pick-detail", text: `Scene ${String(i + 1).padStart(2, "0")} · ` }, copy);
@@ -295,9 +295,8 @@
       if (s.video.posters) v.poster = s.video.posters[run];
       return v;
     }
-    const img = el("img", { alt: "", decoding: "async" });
-    img.src = s.frames[run][f];
-    return img;
+    const img = el("img", { alt: "", decoding: "async", loading: "lazy" });
+    return setFrameImage(img, s.frames[run][f]);
   }
 
   function buildScreens(s) {
@@ -348,11 +347,11 @@
       allVideos().forEach((v) => { if (Math.abs(v.currentTime - t) > 0.04) v.currentTime = t; });
     } else {
       for (const [run, m] of Object.entries(media)) {
-        m.src = cur.frames[run][f];
+        setFrameImage(m, cur.frames[run][f]);
         m.alt = `${cur.model}, frame ${cur.keyframes[f]}: ${RUNS.find((r) => r.key === run).label.toLowerCase()}`;
       }
       for (const [run, m] of Object.entries(wipeEls)) {
-        m.src = cur.frames[run][f];
+        setFrameImage(m, cur.frames[run][f]);
         m.alt = `${cur.model}, frame ${cur.keyframes[f]}: ${RUNS.find((r) => r.key === run).label.toLowerCase()}`;
       }
     }
@@ -415,6 +414,7 @@
     grid.hidden = v !== "grid";
     wipe.hidden = v !== "wipe";
     comparisonControls.hidden = v !== "wipe";
+    updateFrameSizes();
     if (cur && cur.video) {
       hiddenVideos().forEach((x) => x.pause());
       showFrame(k);
@@ -505,6 +505,4 @@
   if ("IntersectionObserver" in window) {
     new IntersectionObserver((es) => { if (!es[0].isIntersecting && playing) setPlaying(false); }, { threshold: 0 }).observe(root);
   }
-  // fetch the other scenes' frames after the page has loaded, so switching is instant
-  window.addEventListener("load", () => scenes.forEach((s) => s.frames && Object.values(s.frames).flat().forEach((src) => { const im = new Image(); im.src = src; })));
 })();

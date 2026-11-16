@@ -81,7 +81,9 @@ h2 { font-size: clamp(1.8rem, 3.5vw, 2.75rem); line-height: 1.12; letter-spacing
 .map-help { font-size: 0.65rem; }
 .map-timing { font-size: 0.6rem; }
 .map-fit { font-size: 0.65rem; min-height: 30px; }
-#watch .wipe-media { aspect-ratio: 384 / 240; border-radius: 10px; }
+#watch .wipe-media { aspect-ratio: 16 / 9; border-radius: 10px; }
+.screen-grid .tile, .ex-wipe, .inset img, .inset video, .ex-row img { aspect-ratio: 16 / 9; }
+.tile img, .tile video, .wipe-media > img, .wipe-media > video, .inset img, .inset video, .ex-row img { object-fit: contain; background: #101c30; }
 .wipe-line::after { content: "↔"; display: grid; place-items: center; color: #21354f; font: 700 18px/1 var(--sans); width: 36px; height: 36px; margin: -18px 0 0 -18px; }
 .inset { box-shadow: 0 0 0 2px #ffffffdd, 0 4px 20px #14253e33; }
 .tag { font-weight: 500; font-size: 0.67rem; padding: 0.4rem 0.55rem; }
@@ -245,7 +247,7 @@ figcaption { font-size: 0.72rem; margin-top: 0.8rem; }
   .demo-fullscreen { font-size: 0.6rem; padding: 0.5rem 0.6rem; }
   .comparison-controls { width: 100%; }
   .comparison-btn { flex: 1; font-size: 0.61rem; padding: 0.55rem 0.35rem; }
-  #watch .wipe-media { aspect-ratio: 384 / 260; }
+  #watch .wipe-media { aspect-ratio: 16 / 9; }
   .transport { padding: 0.6rem; }
   .transport .scrub-wrap { flex-basis: 8rem; min-width: 7rem; }
   .transport .views { margin-left: auto; }
