@@ -60,8 +60,21 @@ h2 { font-size: clamp(1.8rem, 3.5vw, 2.75rem); line-height: 1.12; letter-spacing
 .scene-gain-label { max-width: 16ch; font-size: 0.63rem; line-height: 1.4; color: var(--muted); }
 .scene-improvement.is-failure { color: var(--open); }
 .scene-improvement.is-failure .scene-gain { font-size: 1.1rem; letter-spacing: -0.02em; }
+.scene-summary-actions { display: flex; align-items: center; gap: 1.25rem; }
+.scene-gain-label { max-width: 24ch; }
+.demo-fullscreen { display: inline-flex; align-items: center; gap: 0.4rem; flex-shrink: 0; padding: 0.6rem 0.7rem; min-height: 34px; border: 1px solid var(--rule); border-radius: 6px; color: var(--muted); background: #fff; font: 500 0.68rem/1 var(--sans); cursor: pointer; }
+.demo-fullscreen svg { width: 15px; height: 15px; }
+.demo-fullscreen:hover { color: var(--ours); border-color: #91b6e9; background: #f4f8ff; }
+.demo-fullscreen[hidden] { display: none; }
+.comparison-controls { display: flex; gap: 0.3rem; padding: 0.2rem; margin-bottom: 0.65rem; width: fit-content; max-width: 100%; border: 1px solid var(--rule); border-radius: 7px; background: #f4f7fb; }
+.comparison-controls[hidden] { display: none; }
+.comparison-btn { padding: 0.55rem 0.7rem; border: 0; border-radius: 4px; color: var(--muted); background: transparent; font: 500 0.68rem/1.3 var(--sans); cursor: pointer; }
+.comparison-btn[aria-pressed="true"] { color: var(--ink); background: #fff; box-shadow: 0 1px 4px #172b4d15; }
+.demo-panel:fullscreen { box-sizing: border-box; width: 100%; height: 100%; padding: clamp(1rem, 2.5vw, 2.5rem); overflow: auto; border: 0; border-radius: 0; background: #fff; }
+.demo-panel:fullscreen > .stage { max-width: 1600px; margin: 0 auto; }
+.demo-panel:fullscreen .demo-fullscreen { color: var(--ours); background: #edf4ff; border-color: #91b6e9; }
 .stage { gap: 1.4rem; grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem); }
-.map-header { font-size: 0.7rem; }
+.map-header { font-size: 0.7rem; min-height: 36px; }
 .map-frame { font-size: 0.65rem; }
 .map-surface { border-radius: 9px; }
 .map-caption { padding: 0.7rem 0.8rem; border: 1px solid var(--rule); border-radius: 8px; background: #f8fafd; font-size: 0.75rem; line-height: 1.65; }
@@ -227,6 +240,11 @@ figcaption { font-size: 0.72rem; margin-top: 0.8rem; }
   .scene-gain { font-size: 1.65rem; }
   .scene-gain-label { font-size: 0.57rem; text-align: right; max-width: 16ch; }
   .scene-improvement.is-failure .scene-gain { font-size: 0.85rem; }
+  .scene-summary-actions { flex-direction: column; align-items: flex-end; gap: 0.5rem; }
+  .scene-gain-label { max-width: 18ch; }
+  .demo-fullscreen { font-size: 0.6rem; padding: 0.5rem 0.6rem; }
+  .comparison-controls { width: 100%; }
+  .comparison-btn { flex: 1; font-size: 0.61rem; padding: 0.55rem 0.35rem; }
   #watch .wipe-media { aspect-ratio: 384 / 260; }
   .transport { padding: 0.6rem; }
   .transport .scrub-wrap { flex-basis: 8rem; min-width: 7rem; }

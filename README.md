@@ -22,6 +22,7 @@ To put the page under a `docs/` folder of the code repository instead, copy this
 ## What is on the page
 
 - **Rollout player** (top): seven scenes from the paper, selected with thumbnail tabs. Opens in a large wipe comparison with the recording inset; **All four views** shows the recording, the released model, re-aim alone and re-aim + RGC together. Drag a path or use the arrow keys to scrub the trajectory, toggle paths in the legend, and choose **Fit paths** or **Focus plan**. Without videos it steps through frames 1, 120, 240, 360 and 480 of the paper's frame sheets. Figure traces have no timestamps, so marker timing is approximated by distance along each path; video entries use their measured per-frame camera positions.
+- **Comparison controls**: compare the released model with feedback, or re-aiming alone with re-aiming + RGC. The displayed scene reduction updates to match the selected baseline. **Full screen** expands the demo on supported browsers; Escape returns to the page.
 - **Method overview**: three steps and an expandable paper figure.
 - **Examples**: all nine frame sheets, filtered by model or the failure case. Initially shows four cards; **Show all examples** reveals the rest. Drag across a frame to compare the released model with ours, pick the frame, or open all frames.
 - **Toy loop**: a small simulation in the browser (`assets/js/sim.js`) comparing open loop, re-aim and RGC, with the explanation of RGC. It is labelled as a toy on the page.

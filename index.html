@@ -15,7 +15,7 @@
   <link rel="canonical" href="https://alicaank.github.io/camera-feedback/">
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/css/style.css?v=trajectory-1">
-  <link rel="stylesheet" href="assets/css/presentation.css?v=1">
+  <link rel="stylesheet" href="assets/css/presentation.css?v=2">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -72,7 +72,10 @@
         <div class="picker" role="tablist" aria-label="Choose a scene"></div>
         <div class="scene-summary">
           <div class="scene-identity"><h3 class="scene-model">SANA-WM</h3><p class="scene-caption"></p></div>
-          <div class="scene-improvement"><output class="scene-gain">79×</output><span class="scene-gain-label">lower position error<br>in this scene</span></div>
+          <div class="scene-summary-actions">
+            <div class="scene-improvement"><output class="scene-gain">79×</output><span class="scene-gain-label">lower position error vs. the released model in this scene</span></div>
+            <button class="demo-fullscreen" type="button" aria-pressed="false" hidden><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7 3H3v4m10-4h4v4M3 13v4h4m10-4v4h-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Full screen</span></button>
+          </div>
         </div>
 
         <div class="stage">
@@ -107,6 +110,10 @@
           </figure>
 
           <div class="screens">
+            <div class="comparison-controls" role="group" aria-label="Choose comparison">
+              <button class="comparison-btn" type="button" data-base="open" aria-pressed="true">Released vs. feedback</button>
+              <button class="comparison-btn" type="button" data-base="reaim" aria-pressed="false">Re-aim alone vs. +RGC</button>
+            </div>
             <div class="screen-grid" hidden></div>
             <div class="wipe">
               <div class="wipe-media">
@@ -306,10 +313,10 @@
   <script src="assets/js/data.js"></script>
   <script src="assets/js/videos.js"></script>
   <script src="assets/js/common.js"></script>
-  <script src="assets/js/player.js?v=presentation-1"></script>
+  <script src="assets/js/player.js?v=comparison-2"></script>
   <script src="assets/js/sim.js"></script>
   <script src="assets/js/results.js"></script>
   <script src="assets/js/examples.js?v=presentation-1"></script>
-  <script src="assets/js/presentation.js?v=1"></script>
+  <script src="assets/js/presentation.js?v=2"></script>
 </body>
 </html>

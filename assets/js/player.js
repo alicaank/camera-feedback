@@ -40,6 +40,8 @@
   const wipe = root.querySelector(".wipe");
   const wipeMedia = root.querySelector(".wipe-media");
   const wipeRange = root.querySelector(".wipe-range");
+  const comparisonControls = root.querySelector(".comparison-controls");
+  const comparisonButtons = root.querySelectorAll(".comparison-btn");
   const playBtn = root.querySelector(".play");
   const scrub = root.querySelector(".scrub");
   const timeLabel = root.querySelector(".time");
@@ -59,6 +61,7 @@
   let playing = false, timer = null, raf = null, view = "wipe", userTouched = false;
   let media = {};            // run -> <img>/<video> in the grid
   let wipeEls = {};          // run -> <img>/<video> in the wipe view
+  let comparisonBase = "open";
 
   /* ------------------------------------------------------------ picker */
   scenes.forEach((s, i) => {
@@ -306,14 +309,28 @@
       el("figcaption", { class: "tag tag-" + r.key, text: r.short }, tile);
       media[r.key] = m;
     }
+    buildWipe(s);
+  }
+
+  function buildWipe(s) {
     wipeMedia.querySelectorAll("img, video").forEach((n) => n.remove());
-    wipeEls = { open: makeMedia(s, "open", k), ours: makeMedia(s, "ours", k), target: makeMedia(s, "target", k) };
-    wipeEls.open.classList.add("w-under");
+    wipeEls = { [comparisonBase]: makeMedia(s, comparisonBase, k), ours: makeMedia(s, "ours", k), target: makeMedia(s, "target", k) };
+    wipeEls[comparisonBase].classList.add("w-under");
     wipeEls.ours.classList.add("w-over");
     wipeEls.target.classList.add("w-inset");
-    wipeMedia.prepend(wipeEls.open, wipeEls.ours);
+    wipeMedia.prepend(wipeEls[comparisonBase], wipeEls.ours);
     wipeMedia.querySelector(".inset").prepend(wipeEls.target);
+    updateWipeLabels();
     setWipe(wipeRange.value);
+  }
+
+  function updateWipeLabels() {
+    const label = RUNS.find((r) => r.key === comparisonBase).short;
+    const tag = wipeMedia.querySelector(".w-tag-l");
+    tag.className = `tag tag-${comparisonBase} w-tag-l`;
+    tag.textContent = label;
+    wipeRange.setAttribute("aria-label", `Move the divide between ${label.toLowerCase()} and re-aim + RGC`);
+    comparisonButtons.forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.base === comparisonBase)));
   }
 
   // only the videos of the view on screen are played; the hidden view's are paused and brought to the same time on a switch
@@ -334,7 +351,10 @@
         m.src = cur.frames[run][f];
         m.alt = `${cur.model}, frame ${cur.keyframes[f]}: ${RUNS.find((r) => r.key === run).label.toLowerCase()}`;
       }
-      for (const [run, m] of Object.entries(wipeEls)) m.src = cur.frames[run][f];
+      for (const [run, m] of Object.entries(wipeEls)) {
+        m.src = cur.frames[run][f];
+        m.alt = `${cur.model}, frame ${cur.keyframes[f]}: ${RUNS.find((r) => r.key === run).label.toLowerCase()}`;
+      }
     }
     scrub.value = f;
     updateFrameLabels(f);
@@ -394,6 +414,7 @@
     viewBtns.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
     grid.hidden = v !== "grid";
     wipe.hidden = v !== "wipe";
+    comparisonControls.hidden = v !== "wipe";
     if (cur && cur.video) {
       hiddenVideos().forEach((x) => x.pause());
       showFrame(k);
@@ -406,6 +427,41 @@
     wipeMedia.style.setProperty("--cut", p + "%");
   }
   wipeRange.addEventListener("input", () => setWipe(wipeRange.value));
+
+  function comparisonFactor(scene) {
+    const ratio = scene.errors[comparisonBase] / scene.errors.ours;
+    return comparisonBase === "open" && scene.factor ? scene.factor : ratio >= 9.5 ? ratio.toFixed(0) : ratio.toFixed(1);
+  }
+  function updateComparisonStats() {
+    const ratio = cur.errors[comparisonBase] / cur.errors.ours;
+    const factor = comparisonFactor(cur);
+    const better = ratio >= 1;
+    const baseline = comparisonBase === "open" ? "the released model" : "re-aiming alone";
+    root.querySelector(".scene-gain").textContent = better ? `${factor}×` : "Higher error";
+    root.querySelector(".scene-gain-label").textContent = better ? `lower position error vs. ${baseline} in this scene` : `Higher position error than ${baseline} in this scene`;
+    root.querySelector(".scene-improvement").classList.toggle("is-failure", !better);
+    scenes.forEach((scene, i) => {
+      picker.children[i].querySelector(".pick-factor").textContent = `${comparisonFactor(scene)}×`;
+      picker.children[i].classList.toggle("pick-worst", scene.errors[comparisonBase] < scene.errors.ours);
+    });
+  }
+  comparisonButtons.forEach((button) => button.addEventListener("click", () => {
+    if (comparisonBase === button.dataset.base) return;
+    userTouched = true;
+    const wasPlaying = playing;
+    setPlaying(false);
+    const previousBase = comparisonBase;
+    comparisonBase = button.dataset.base;
+    const replacement = makeMedia(cur, comparisonBase, k);
+    replacement.classList.add("w-under");
+    wipeEls[previousBase].replaceWith(replacement);
+    delete wipeEls[previousBase];
+    wipeEls[comparisonBase] = replacement;
+    updateWipeLabels();
+    showFrame(k);
+    updateComparisonStats();
+    if (wasPlaying) setPlaying(true);
+  }));
 
   /* ------------------------------------------------------------ select a scene */
   function select(i) {
@@ -431,9 +487,7 @@
     const better = f && parseFloat(f) >= 1;
     root.querySelector(".scene-model").textContent = cur.model;
     root.querySelector(".scene-caption").textContent = `Scene ${String(i + 1).padStart(2, "0")} / ${cur.scene} · ${cur.video ? "Video rollout" : "Paper keyframes"}`;
-    root.querySelector(".scene-gain").textContent = better ? `${f}×` : "Higher error";
-    root.querySelector(".scene-gain-label").textContent = better ? "lower position error in this scene" : "Feedback fails in this scene";
-    root.querySelector(".scene-improvement").classList.toggle("is-failure", !better);
+    updateComparisonStats();
     readout.innerHTML =
       `<strong>${cur.model}</strong>, scene ${cur.scene}. Mean position error ` +
       `<span class="r-open">${fmt(e.open)}</span> run as usual, ` +
