@@ -16,7 +16,9 @@
     const last = x.keyframes.length - 1;
     const card = el("article", { class: "ex-card" + (x.worse ? " ex-worse" : "") }, grid);
     const head = el("header", { class: "ex-head" }, card);
-    el("h3", { text: x.model }, head);
+    const identity = el("div", {}, head);
+    el("h3", { text: x.model }, identity);
+    el("span", { class: "ex-scene", text: `Scene ${x.scene}` }, identity);
     el("span", { class: "ex-factor", text: x.worse ? "Feedback fails here" : `${x.factor}× lower camera error` }, head);
 
     // the wipe
@@ -73,4 +75,32 @@
     const e = x.errors;
     el("p", { class: "ex-nums", html: `Scene ${x.scene}. Mean position error <span class="r-open">${fmt(e.open)}</span> run as usual, <span class="r-reaim">${fmt(e.reaim)}</span> with re-aiming alone, <span class="r-ours">${fmt(e.ours)}</span> with RGC.` + (x.worse ? " The RGC run follows the plan until about frame 330, then runs past its end and loses the scene." : "") }, card);
   });
+
+  const filters = root.querySelector(".gallery-filters");
+  const moreButton = root.querySelector(".gallery-more");
+  const count = root.querySelector(".gallery-count");
+  const cards = [...grid.children];
+  let activeModel = "all", expanded = false;
+  const choices = [{ key: "all", label: "All models" }, ...[...new Set(D.examples.map((x) => x.model))].map((model) => ({ key: model, label: model })), { key: "failure", label: "Failure case" }];
+  function updateGallery() {
+    const matching = D.examples.map((x, i) => ({ x, i })).filter(({ x }) => activeModel === "all" || (activeModel === "failure" ? x.worse : x.model === activeModel));
+    const shown = activeModel === "all" && !expanded ? matching.slice(0, 4) : matching;
+    const visible = new Set(shown.map(({ i }) => i));
+    cards.forEach((card, i) => { card.hidden = !visible.has(i); });
+    filters.querySelectorAll("button").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.model === activeModel)));
+    count.textContent = `${shown.length} of ${matching.length} scenes`;
+    moreButton.hidden = activeModel !== "all" || matching.length <= 4;
+    moreButton.setAttribute("aria-expanded", String(expanded));
+    moreButton.textContent = expanded ? "Show fewer examples ↑" : `Show all ${matching.length} examples ↗`;
+  }
+  choices.forEach(({ key, label }) => {
+    const button = el("button", { type: "button", class: "gallery-filter", "data-model": key, text: label }, filters);
+    button.addEventListener("click", () => { activeModel = key; updateGallery(); });
+  });
+  moreButton.addEventListener("click", () => {
+    expanded = !expanded;
+    updateGallery();
+    if (!expanded) root.scrollIntoView({ behavior: reduceMotion ? "instant" : "smooth", block: "start" });
+  });
+  updateGallery();
 })();

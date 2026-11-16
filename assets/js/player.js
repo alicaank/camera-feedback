@@ -56,15 +56,19 @@
 
   let cur = null;            // the scene shown
   let k = 4;                 // frame mode: index into keyframes (opens on frame 480, where the runs differ most); video mode: frame number
-  let playing = false, timer = null, raf = null, view = "grid", userTouched = false;
+  let playing = false, timer = null, raf = null, view = "wipe", userTouched = false;
   let media = {};            // run -> <img>/<video> in the grid
   let wipeEls = {};          // run -> <img>/<video> in the wipe view
 
   /* ------------------------------------------------------------ picker */
   scenes.forEach((s, i) => {
-    const b = el("button", { class: "pick" + (s.worst ? " pick-worst" : ""), role: "tab", type: "button" }, picker);
-    el("span", { class: "pick-model", text: s.model }, b);
-    el("span", { class: "pick-factor", text: s.factor ? s.factor + "×" : "" }, b);
+    const b = el("button", { class: "pick" + (s.worst ? " pick-worst" : ""), role: "tab", type: "button", "aria-label": `${s.model}, scene ${s.scene}` }, picker);
+    const thumbnail = s.frames?.target?.at(-1) || s.video?.posters?.target;
+    if (thumbnail) el("img", { class: "pick-thumbnail", src: thumbnail, alt: "", width: 64, height: 46, decoding: "async" }, b);
+    const copy = el("span", { class: "pick-copy" }, b);
+    el("span", { class: "pick-model", text: s.model }, copy);
+    const detail = el("span", { class: "pick-detail", text: `Scene ${String(i + 1).padStart(2, "0")} · ` }, copy);
+    el("span", { class: "pick-factor", text: s.factor ? s.factor + "×" : "" }, detail);
     b.addEventListener("click", () => select(i));
   });
   picker.addEventListener("keydown", (e) => {
@@ -409,6 +413,8 @@
     setPlaying(false);
     cur = scenes[i];
     [...picker.children].forEach((b, j) => { b.setAttribute("aria-selected", String(j === i)); b.tabIndex = j === i ? 0 : -1; });
+    const selected = picker.children[i];
+    picker.scrollTo({ left: selected.offsetLeft - (picker.clientWidth - selected.offsetWidth) / 2, behavior: reduceMotion ? "instant" : "smooth" });
     const n = cur.video ? cur.video.frames : cur.keyframes.length;
     scrub.max = n - 1;
     k = cur.video ? 0 : Math.min(k, n - 1);
@@ -423,6 +429,11 @@
 
     const e = cur.errors, f = cur.factor;
     const better = f && parseFloat(f) >= 1;
+    root.querySelector(".scene-model").textContent = cur.model;
+    root.querySelector(".scene-caption").textContent = `Scene ${String(i + 1).padStart(2, "0")} / ${cur.scene} · ${cur.video ? "Video rollout" : "Paper keyframes"}`;
+    root.querySelector(".scene-gain").textContent = better ? `${f}×` : "Higher error";
+    root.querySelector(".scene-gain-label").textContent = better ? "lower position error in this scene" : "Feedback fails in this scene";
+    root.querySelector(".scene-improvement").classList.toggle("is-failure", !better);
     readout.innerHTML =
       `<strong>${cur.model}</strong>, scene ${cur.scene}. Mean position error ` +
       `<span class="r-open">${fmt(e.open)}</span> run as usual, ` +
@@ -433,7 +444,7 @@
   }
 
   select(0);
-  setView("grid");
+  setView("wipe");
   // one moment of motion: start stepping through the frames once the player is on screen
   onFirstView(root, () => { if (!reduceMotion && !userTouched) setPlaying(true); });
   // pause when the player leaves the screen
