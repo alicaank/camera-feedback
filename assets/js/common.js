@@ -1,9 +1,8 @@
 /* Shared helpers and page-wide behaviour. Loaded first; player.js, sim.js, gallery.js and results.js use these globals.
    Project page behaviour. Data comes from assets/js/data.js (generated from the paper by
-   scripts/export_project_page.py). Edit the links here once the paper, supplement and code are public. */
+   scripts/export_project_page.py). Edit the links here once the paper and code are public. */
 const LINKS = {
   paper: "",        // e.g. "paper.pdf" or an OpenReview / CVF link
-  supplement: "",   // e.g. "supplement.pdf"
   arxiv: "",        // e.g. "https://arxiv.org/abs/XXXX.XXXXX"
   code: "",         // e.g. "https://github.com/<you>/<repo>"
 };

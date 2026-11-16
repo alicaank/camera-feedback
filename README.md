@@ -15,7 +15,7 @@ To put the page under a `docs/` folder of the code repository instead, copy this
 ## Before you publish
 
 - During CVPR review the page stays anonymous. Keep "Anonymous authors", keep the repository private or unlisted, and do not link it from the paper or social media until the review rules allow it.
-- Once allowed, fill in the links at the top of `assets/js/common.js` (`LINKS`: paper, supplement, arXiv, code). Empty links show as "(soon)" and are not clickable.
+- Once allowed, fill in the links at the top of `assets/js/common.js` (`LINKS`: paper, arXiv, code). Empty links show as "(soon)" and are not clickable.
 - Replace the author line in `index.html` (`data-config="authors"`), the venue line, and the BibTeX entry.
 - Optional: set `og:image` in `index.html` to an absolute URL so link previews show the figure.
 
