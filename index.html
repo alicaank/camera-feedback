@@ -13,7 +13,7 @@
   <meta name="theme-color" content="#fafbf9">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="canonical" href="https://alicaank.github.io/camera-feedback/">
-  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/style.css?v=trajectory-1">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -67,21 +67,31 @@
 
         <div class="stage">
           <figure class="map">
-            <svg class="map-svg" viewBox="0 0 1000 1000" role="img" aria-labelledby="map-title">
+            <div class="map-header"><span>Camera trajectory</span><output class="map-frame">Frame 480</output></div>
+            <div class="map-surface">
+            <svg class="map-svg" viewBox="0 0 1000 1000" role="slider" tabindex="0" aria-labelledby="map-title" aria-describedby="map-help map-timing" aria-valuemin="1" aria-valuemax="480" aria-valuenow="480">
               <title id="map-title">Camera paths seen from above</title>
               <defs>
                 <pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse">
                   <path d="M100 0H0V100" fill="none" class="grid-line"/>
                 </pattern>
-                <clipPath id="map-clip"><rect x="0" y="0" width="1000" height="1000" rx="28"/></clipPath>
+                <clipPath id="map-clip"><rect data-map-bounds x="0" y="0" width="1000" height="1000"/></clipPath>
               </defs>
               <g clip-path="url(#map-clip)">
-                <rect class="map-bg" x="0" y="0" width="1000" height="1000"/>
-                <rect x="0" y="0" width="1000" height="1000" fill="url(#grid)"/>
+                <rect data-map-bounds class="map-bg" x="0" y="0" width="1000" height="1000"/>
+                <rect data-map-bounds x="0" y="0" width="1000" height="1000" fill="url(#grid)"/>
                 <g class="map-paths"></g>
                 <g class="map-live"></g>
               </g>
             </svg>
+            <div class="map-tooltip" hidden></div>
+            </div>
+            <div class="map-controls" role="group" aria-label="Trajectory view">
+              <button type="button" class="map-fit" data-fit="all" aria-pressed="true">Fit paths</button>
+              <button type="button" class="map-fit" data-fit="plan" aria-pressed="false">Focus plan</button>
+            </div>
+            <p class="map-help" id="map-help">Drag a path or use the arrow keys to change frames.</p>
+            <p class="map-timing" id="map-timing">Marker timing is approximate; images show five keyframes.</p>
             <div class="err-strip" hidden></div>
             <figcaption class="map-caption"><span class="readout"></span></figcaption>
           </figure>
@@ -113,12 +123,12 @@
         </div>
 
         <ul class="legend" aria-label="Legend">
-          <li><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-plan"/></svg>Planned path</li>
-          <li><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-open"/></svg>Open loop</li>
-          <li><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-reaim"/></svg>Re-aim alone</li>
-          <li><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-ours"/></svg>Re-aim + RGC</li>
+          <li><button class="trajectory-toggle" type="button" data-path="plan" aria-pressed="true"><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-plan"/></svg>Planned path</button></li>
+          <li><button class="trajectory-toggle" type="button" data-path="open" aria-pressed="true"><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-open"/></svg>Open loop</button></li>
+          <li><button class="trajectory-toggle" type="button" data-path="reaim" aria-pressed="true"><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-reaim"/></svg>Re-aim alone</button></li>
+          <li><button class="trajectory-toggle" type="button" data-path="ours" aria-pressed="true"><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-ours"/></svg>Re-aim + RGC</button></li>
           <li><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4" class="lg-start"/></svg>Start</li>
-          <li><svg width="12" height="12" aria-hidden="true"><rect x="2" y="2" width="8" height="8" class="lg-mark"/></svg>Frame 480</li>
+          <li><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4" class="lg-mark"/></svg>Current position</li>
         </ul>
         </div>
       </div>
@@ -257,7 +267,7 @@
   <script src="assets/js/data.js"></script>
   <script src="assets/js/videos.js"></script>
   <script src="assets/js/common.js"></script>
-  <script src="assets/js/player.js"></script>
+  <script src="assets/js/player.js?v=trajectory-1"></script>
   <script src="assets/js/sim.js"></script>
   <script src="assets/js/results.js"></script>
   <script src="assets/js/examples.js"></script>

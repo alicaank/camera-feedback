@@ -44,6 +44,15 @@
   const scrub = root.querySelector(".scrub");
   const timeLabel = root.querySelector(".time");
   const viewBtns = root.querySelectorAll(".view-btn");
+  const mapFrame = root.querySelector(".map-frame");
+  const mapTiming = root.querySelector(".map-timing");
+  const mapTip = root.querySelector(".map-tooltip");
+  const pathToggles = root.querySelectorAll(".trajectory-toggle");
+  const fitButtons = root.querySelectorAll(".map-fit");
+  const mapRuns = ["plan", ...PATHS];
+  const mapLabels = { plan: "Planned path", open: "Open loop", reaim: "Re-aim alone", ours: "Re-aim + RGC" };
+  const hiddenPaths = new Set();
+  let mapTracks = {}, fitMode = "all", mapSize = 1000, dragPointer = null, dragRun = null, hoveredRun = null;
 
   let cur = null;            // the scene shown
   let k = 4;                 // frame mode: index into keyframes (opens on frame 480, where the runs differ most); video mode: frame number
@@ -70,45 +79,184 @@
   /* ------------------------------------------------------------ map */
   function track(s, run) { return s.video ? s.video.track[run] : s.paths[run]; }
 
-  function drawStatic(s) {
-    staticLayer.replaceChildren();
-    liveLayer.replaceChildren();
-    const ghost = !!s.video;   // with videos the full paths are faint and the live path is drawn on top
-    const anim = reduceMotion || ghost ? "" : " draw";
-    for (const r of PATHS) {
-      staticLayer.appendChild(polyline(track(s, r), `p-${r}${ghost ? " ghost" : ""}${anim}`, { pathLength: 1 }));
-    }
-    staticLayer.appendChild(polyline(track(s, "plan"), "p-plan"));
-    const st = track(s, "plan")[0];
-    el("svg:circle", { cx: st[0], cy: st[1], r: 12, class: "m-start" }, staticLayer);
-    if (!s.video) {
-      // the ends of the paths: frame 480
-      const ends = el("svg:g", { class: "ends" + (reduceMotion ? "" : " fade-in") }, staticLayer);
-      for (const r of ["plan", ...PATHS]) {
-        const q = track(s, r).at(-1);
-        if (q[0] < 10 || q[0] > 990 || q[1] < 10 || q[1] > 990) continue;
-        el("svg:rect", { x: q[0] - 11, y: q[1] - 11, width: 22, height: 22, class: `m-mark m-${r}` }, ends);
+  function prepareTracks(s) {
+    mapTracks = {};
+    for (const run of mapRuns) {
+      const points = track(s, run), lengths = [0];
+      for (let i = 1; i < points.length; i++) {
+        lengths.push(lengths[i - 1] + Math.hypot(points[i][0] - points[i - 1][0], points[i][1] - points[i - 1][1]));
       }
+      mapTracks[run] = { points, lengths, total: lengths.at(-1) };
     }
   }
 
+  // Exported figure traces have no timestamps. For frame sheets, distribute progress
+  // by arc length and label timing as approximate. Video tracks retain measured timing.
+  function mapSample(s, run, f) {
+    const { points, lengths, total } = mapTracks[run];
+    if (s.video) {
+      const i = Math.min(f, points.length - 1);
+      return { point: points[i], trail: points.slice(0, i + 1) };
+    }
+    const progress = (s.keyframes[f] - s.keyframes[0]) / (s.keyframes.at(-1) - s.keyframes[0]);
+    const distance = progress * total;
+    for (let i = 1; i < points.length; i++) {
+      if (lengths[i] < distance) continue;
+      const t = (distance - lengths[i - 1]) / (lengths[i] - lengths[i - 1] || 1);
+      const point = points[i - 1].map((v, axis) => v + t * (points[i][axis] - v));
+      return { point, trail: [...points.slice(0, i), point] };
+    }
+    return { point: points.at(-1), trail: points };
+  }
+
+  function mapGroup(parent, run) {
+    const group = el("svg:g", { class: "trajectory-track" + (hoveredRun === run ? " is-highlighted" : ""), "data-path": run }, parent);
+    group.toggleAttribute("hidden", hiddenPaths.has(run));
+    return group;
+  }
+
+  function drawStatic(s) {
+    staticLayer.replaceChildren();
+    for (const r of mapRuns) {
+      mapGroup(staticLayer, r).appendChild(polyline(track(s, r), `p-${r} ghost`));
+    }
+    const st = track(s, "plan")[0];
+    el("svg:circle", { cx: st[0], cy: st[1], r: 12 * mapSize / 1000, class: "m-start" }, staticLayer);
+  }
+
   function drawLive(s, f) {
-    if (!s.video) {
-      staticLayer.querySelector(".ends")?.classList.toggle("now", f === s.keyframes.length - 1);
-      return;
-    }
     liveLayer.replaceChildren();
-    for (const r of PATHS) {
-      const pts = track(s, r).slice(0, f + 1);
-      if (pts.length > 1) liveLayer.appendChild(polyline(pts, `p-${r}`));
-    }
-    for (const r of ["plan", ...PATHS]) {
-      const q = track(s, r)[Math.min(f, track(s, r).length - 1)];
-      if (q[0] < 0 || q[0] > 1000 || q[1] < 0 || q[1] > 1000) continue;
-      el("svg:circle", { cx: q[0], cy: q[1], r: r === "plan" ? 10 : 14, class: `cam cam-${r}` }, liveLayer);
+    for (const r of [...PATHS, "plan"]) {
+      const { point: q, trail } = mapSample(s, r, f);
+      const group = mapGroup(liveLayer, r);
+      if (trail.length > 1) group.appendChild(polyline(trail, `p-${r}`));
+      el("svg:circle", { cx: q[0], cy: q[1], r: (r === "plan" ? 10 : 14) * mapSize / 1000, class: `cam cam-${r}` }, group);
     }
     drawStripHead(f);
   }
+
+  function fitMap() {
+    const runs = fitMode === "plan" ? ["plan"] : mapRuns.filter((r) => !hiddenPaths.has(r));
+    const points = runs.flatMap((r) => mapTracks[r].points);
+    const xs = points.map((p) => p[0]), ys = points.map((p) => p[1]);
+    const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+    mapSize = Math.max(80, maxX - minX, maxY - minY) * 1.25;
+    const x = (minX + maxX - mapSize) / 2, y = (minY + maxY - mapSize) / 2;
+    svg.setAttribute("viewBox", `${x} ${y} ${mapSize} ${mapSize}`);
+    svg.querySelectorAll("[data-map-bounds]").forEach((rect) => {
+      for (const [attr, value] of Object.entries({ x, y, width: mapSize, height: mapSize })) rect.setAttribute(attr, value);
+    });
+    fitButtons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.fit === fitMode)));
+    clearMapHover();
+    drawStatic(cur);
+    drawLive(cur, k);
+  }
+
+  fitButtons.forEach((b) => b.addEventListener("click", () => { fitMode = b.dataset.fit; fitMap(); }));
+  pathToggles.forEach((b) => b.addEventListener("click", () => {
+    const run = b.dataset.path;
+    if (hiddenPaths.has(run)) hiddenPaths.delete(run);
+    else hiddenPaths.add(run);
+    pathToggles.forEach((toggle) => {
+      const shown = !hiddenPaths.has(toggle.dataset.path);
+      toggle.setAttribute("aria-pressed", String(shown));
+      toggle.disabled = shown && hiddenPaths.size === mapRuns.length - 1;
+    });
+    fitMap();
+  }));
+
+  function nearestFrame(progress) {
+    if (cur.video) return Math.round(progress * (cur.video.frames - 1));
+    const target = cur.keyframes[0] + progress * (cur.keyframes.at(-1) - cur.keyframes[0]);
+    return cur.keyframes.reduce((best, frame, i) => Math.abs(frame - target) < Math.abs(cur.keyframes[best] - target) ? i : best, 0);
+  }
+
+  function mapHit(e, onlyRun = null) {
+    const matrix = svg.getScreenCTM();
+    if (!matrix) return null;
+    const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(matrix.inverse());
+    let hit = null;
+    for (const run of mapRuns.filter((r) => !hiddenPaths.has(r) && (!onlyRun || onlyRun === r))) {
+      const { points, lengths, total } = mapTracks[run];
+      for (let i = 1; i < points.length; i++) {
+        const a = points[i - 1], b = points[i], dx = b[0] - a[0], dy = b[1] - a[1];
+        const t = Math.max(0, Math.min(1, ((p.x - a[0]) * dx + (p.y - a[1]) * dy) / (dx * dx + dy * dy || 1)));
+        const distance = Math.hypot(p.x - a[0] - t * dx, p.y - a[1] - t * dy);
+        if (hit && hit.distance <= distance) continue;
+        const progress = cur.video ? (i - 1 + t) / (points.length - 1) : (lengths[i - 1] + t * (lengths[i] - lengths[i - 1])) / (total || 1);
+        hit = { run, distance, frame: nearestFrame(progress) };
+      }
+    }
+    return hit;
+  }
+
+  function clearMapHover() {
+    hoveredRun = null;
+    mapTip.hidden = true;
+    svg.classList.remove("is-highlighting");
+    svg.querySelectorAll(".is-highlighted").forEach((g) => g.classList.remove("is-highlighted"));
+  }
+
+  function hoverMap(e, hit) {
+    clearMapHover();
+    if (!hit) return;
+    hoveredRun = hit.run;
+    svg.classList.add("is-highlighting");
+    svg.querySelectorAll(`.trajectory-track[data-path="${hit.run}"]`).forEach((g) => g.classList.add("is-highlighted"));
+    const frame = cur.video ? hit.frame : cur.keyframes[hit.frame];
+    mapTip.textContent = `${mapLabels[hit.run]} · ${cur.video ? "" : "≈ "}frame ${frame}`;
+    const box = svg.getBoundingClientRect();
+    mapTip.style.left = Math.max(78, Math.min(box.width - 78, e.clientX - box.left)) + "px";
+    mapTip.style.top = Math.max(35, e.clientY - box.top - 12) + "px";
+    mapTip.hidden = false;
+  }
+
+  function seekMap(e) {
+    const hit = mapHit(e, dragRun);
+    if (!hit) return;
+    if (hit.frame !== k) showFrame(hit.frame);
+    if (e.pointerType === "mouse") hoverMap(e, hit);
+  }
+
+  svg.addEventListener("pointerdown", (e) => {
+    if (!e.isPrimary || e.button !== 0) return;
+    userTouched = true;
+    setPlaying(false);
+    dragPointer = e.pointerId;
+    dragRun = mapHit(e)?.run || null;
+    svg.setPointerCapture(e.pointerId);
+    svg.classList.add("is-dragging");
+    svg.focus({ preventScroll: true });
+    seekMap(e);
+  });
+  svg.addEventListener("pointermove", (e) => {
+    if (e.pointerId === dragPointer) seekMap(e);
+    else if (dragPointer === null && e.pointerType === "mouse") hoverMap(e, mapHit(e));
+  });
+  function endMapDrag(e) {
+    if (e.pointerId !== dragPointer) return;
+    dragPointer = null;
+    dragRun = null;
+    svg.classList.remove("is-dragging");
+    if (svg.hasPointerCapture(e.pointerId)) svg.releasePointerCapture(e.pointerId);
+    clearMapHover();
+  }
+  svg.addEventListener("pointerup", endMapDrag);
+  svg.addEventListener("pointercancel", endMapDrag);
+  svg.addEventListener("lostpointercapture", endMapDrag);
+  svg.addEventListener("pointerleave", () => { if (dragPointer === null) clearMapHover(); });
+  svg.addEventListener("blur", clearMapHover);
+  svg.addEventListener("keydown", (e) => {
+    const step = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[e.key];
+    if (step == null && !["Home", "End", " "].includes(e.key)) return;
+    e.preventDefault();
+    userTouched = true;
+    clearMapHover();
+    if (e.key === " ") { setPlaying(!playing); return; }
+    setPlaying(false);
+    const last = +scrub.max;
+    showFrame(e.key === "Home" ? 0 : e.key === "End" ? last : Math.max(0, Math.min(last, k + step)));
+  });
 
   /* per-frame error under the map (video mode only) */
   let stripHead = null;
@@ -185,11 +333,20 @@
       for (const [run, m] of Object.entries(wipeEls)) m.src = cur.frames[run][f];
     }
     scrub.value = f;
+    updateFrameLabels(f);
+    drawLive(cur, f);
+  }
+
+  function updateFrameLabels(f) {
     const frameNo = cur.video ? f : cur.keyframes[f];
     const last = cur.video ? cur.video.frames - 1 : cur.keyframes.at(-1);
     timeLabel.textContent = `Frame ${frameNo} of ${last}`;
     scrub.setAttribute("aria-valuetext", timeLabel.textContent);
-    drawLive(cur, f);
+    mapFrame.textContent = `Frame ${frameNo}`;
+    svg.setAttribute("aria-valuemin", cur.video ? 0 : cur.keyframes[0]);
+    svg.setAttribute("aria-valuemax", last);
+    svg.setAttribute("aria-valuenow", frameNo);
+    svg.setAttribute("aria-valuetext", timeLabel.textContent + (cur.video ? "" : "; approximate trajectory position"));
   }
 
   /* ------------------------------------------------------------ transport */
@@ -216,7 +373,7 @@
     const f = Math.min(cur.video.frames - 1, Math.round(t * cur.video.fps));
     if (f !== k) {
       k = f; scrub.value = f;
-      timeLabel.textContent = `Frame ${f} of ${cur.video.frames - 1}`;
+      updateFrameLabels(f);
       drawLive(cur, f);
     }
     if (playing) raf = requestAnimationFrame(tick);
@@ -257,7 +414,9 @@
     k = cur.video ? 0 : Math.min(k, n - 1);
     root.querySelector(".scrub-ticks").replaceChildren(
       ...(cur.video ? [] : cur.keyframes.map((f) => el("span", { text: String(f) }))));
-    drawStatic(cur);
+    prepareTracks(cur);
+    fitMap();
+    mapTiming.textContent = cur.video ? "Markers show the measured camera position at each frame." : "Marker timing is approximate; images show five keyframes.";
     drawStrip(cur);
     buildScreens(cur);
     showFrame(k);

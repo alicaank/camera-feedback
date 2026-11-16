@@ -145,11 +145,38 @@ a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-v
 
 .stage {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(15rem, 19rem);
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, 21rem);
   gap: clamp(1rem, 2.5vw, 2rem);
   align-items: start;
 }
-.map { margin: 0; }
+.map { margin: 0; min-width: 0; }
+.map-header { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.6rem; font: 600 0.8rem/1.4 var(--sans); }
+.map-frame { font-size: 0.75rem; color: var(--ours); font-variant-numeric: tabular-nums; }
+.map-surface { position: relative; border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; }
+.map-svg { cursor: crosshair; touch-action: none; user-select: none; }
+.map-svg.is-dragging { cursor: grabbing; }
+.map-surface:focus-within { outline: 2px solid var(--focus); outline-offset: 3px; }
+.map-svg:focus-visible { outline: none; }
+.map-svg .p-plan, .map-svg .p-open, .map-svg .p-reaim, .map-svg .p-ours { vector-effect: non-scaling-stroke; }
+.map-svg .p-plan { stroke-width: 1.5; stroke-dasharray: 5 4; }
+.map-svg .p-open { stroke-width: 2; }
+.map-svg .p-reaim { stroke-width: 1.6; }
+.map-svg .p-ours { stroke-width: 2.8; }
+.map-svg .grid-line { vector-effect: non-scaling-stroke; stroke-width: 0.5; }
+.map-svg .cam { vector-effect: non-scaling-stroke; stroke-width: 2; }
+.trajectory-track[hidden] { display: none; }
+.map-svg.is-highlighting .trajectory-track:not(.is-highlighted) { opacity: 0.2; }
+.map-controls { display: flex; gap: 0.4rem; margin-top: 0.65rem; }
+.map-fit { padding: 0.45rem 0.7rem; border: 1px solid var(--rule); border-radius: 7px; background: transparent; color: var(--muted); font: 600 0.75rem/1 var(--sans); cursor: pointer; }
+.map-fit[aria-pressed="true"] { border-color: var(--ours); color: var(--ours); background: #edf4ff; }
+.map-help, .map-timing { font: 400 0.75rem/1.5 var(--sans); color: var(--muted); margin: 0.65rem 0 0; }
+.map-timing { margin-top: 0.25rem; font-size: 0.7rem; }
+.map-tooltip { position: absolute; z-index: 2; pointer-events: none; padding: 0.4rem 0.55rem; border-radius: 6px; background: var(--ink); color: #fff; font: 500 0.7rem/1.4 var(--sans); white-space: nowrap; transform: translate(-50%, -100%); }
+.map-tooltip[hidden] { display: none; }
+.trajectory-toggle { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.4rem 0.55rem; min-height: 36px; border: 1px solid var(--rule); border-radius: 7px; background: #fff; color: var(--ink); font: inherit; cursor: pointer; }
+.trajectory-toggle[aria-pressed="false"] { color: var(--muted); text-decoration: line-through; background: var(--tile); }
+.trajectory-toggle[aria-pressed="false"] svg { opacity: 0.35; }
+.trajectory-toggle:disabled { cursor: default; }
 .stage .screens { order: -1; }
 .map-caption { font-size: 0.9rem; }
 .map-svg { width: 100%; height: auto; display: block; }
@@ -465,9 +492,7 @@ td.best { font-weight: 800; }
   .demo-intro { display: block; }
   .hero-lead { margin-top: 0.8rem; max-width: 60ch; }
   .stage, .two-col, .sim-stage { grid-template-columns: 1fr; }
-  .map { display: grid; grid-template-columns: 9.5rem 1fr; gap: 0.4rem 1rem; align-items: start; }
-  .map .map-caption { grid-column: 2; grid-row: 1; margin-top: 0; }
-  .map .err-strip { grid-column: 1 / -1; }
+  .map { width: 100%; max-width: 30rem; margin: 0 auto; }
   .ex-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 600px) {

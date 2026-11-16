@@ -21,7 +21,7 @@ To put the page under a `docs/` folder of the code repository instead, copy this
 
 ## What is on the page
 
-- **Rollout player** (top): seven scenes from the paper. Large frames of the recording, the released model, re-aim alone and re-aim + RGC, side by side or as a wipe, with a small map of the camera paths. Without videos it steps through frames 1, 120, 240, 360 and 480 of the paper's frame sheets.
+- **Rollout player** (top): seven scenes from the paper. Large frames of the recording, the released model, re-aim alone and re-aim + RGC, side by side or as a wipe, with an interactive map of the camera paths. Drag a path or use the arrow keys to scrub, toggle paths in the legend, and choose **Fit paths** or **Focus plan**. Without videos it steps through frames 1, 120, 240, 360 and 480 of the paper's frame sheets. Figure traces have no timestamps, so marker timing is approximated by distance along each path; video entries use their measured per-frame camera positions.
 - **Examples**: all nine frame sheets of the paper as cards. Drag across a frame to compare the released model with ours, pick the frame, or open all frames.
 - **Toy loop**: a small simulation in the browser (`assets/js/sim.js`) comparing open loop, re-aim and RGC, with the explanation of RGC. It is labelled as a toy on the page.
 - **Results chart** for all eight models, with the full table behind "Show all numbers", and the error over time.
