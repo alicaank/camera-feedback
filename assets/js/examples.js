@@ -1,4 +1,4 @@
-/* Examples: every frame sheet of the paper as a card. Drag across the frame to compare the released model with ours;
+/* Examples: every frame sheet of the paper as a card. Drag across the frame to compare the world model with ours;
    the recording at the planned pose sits in the corner. "All frames" opens the full sheet: 4 runs x 5 frames.
    Data: PAGE_DATA.examples. */
 (function () {
@@ -7,8 +7,8 @@
   const grid = root.querySelector(".ex-grid");
   const ROWS = [
     { key: "target", label: "Recording" },
-    { key: "open", label: "Released model" },
-    { key: "reaim", label: "Re-aim alone" },
+    { key: "open", label: "World model" },
+    { key: "reaim", label: "Re-aim" },
     { key: "ours", label: "Re-aim + RGC" },
   ];
 
@@ -27,12 +27,12 @@
     const under = img("open", last, "w-under");
     const over = img("ours", last, "w-over");
     el("span", { class: "wipe-line", "aria-hidden": "true" }, media);
-    el("span", { class: "tag tag-open w-tag-l", text: "Released model" }, media);
+    el("span", { class: "tag tag-open w-tag-l", text: x.model }, media);
     el("span", { class: "tag tag-ours w-tag-r", text: "Re-aim + RGC" }, media);
     const inset = el("figure", { class: "inset" }, media);
     const rec = setFrameImage(el("img", { alt: "", loading: "lazy", decoding: "async" }, inset), x.frames.target[last], 160);
     el("figcaption", { class: "tag tag-target", text: "Recording" }, inset);
-    const range = el("input", { class: "wipe-range", type: "range", min: 0, max: 100, value: 50, "aria-label": `${x.model}: move the divide between the released model and ours` }, media);
+    const range = el("input", { class: "wipe-range", type: "range", min: 0, max: 100, value: 50, "aria-label": `Move the divider between ${x.model} and Re-aim + RGC` }, media);
     range.addEventListener("input", () => media.style.setProperty("--cut", range.value + "%"));
 
     // frame chips
@@ -42,7 +42,7 @@
     const show = (f) => {
       setFrameImage(under, x.frames.open[f]); setFrameImage(over, x.frames.ours[f]); setFrameImage(rec, x.frames.target[f], 160);
       const label = `${x.model}, frame ${x.keyframes[f]}`;
-      under.alt = `${label}: released model`; over.alt = `${label}: with our feedback`; rec.alt = `${label}: recording at the planned pose`;
+      under.alt = `${label}: World model`; over.alt = `${label}: Re-aim + RGC`; rec.alt = `${label}: recording at the planned pose`;
       chips.querySelectorAll("button").forEach((b, i) => b.setAttribute("aria-checked", String(i === f)));
     };
     x.keyframes.forEach((fr, i) => {
@@ -63,7 +63,7 @@
         x.keyframes.forEach((f) => el("span", { text: String(f) }, head));
         for (const r of ROWS) {
           const row = el("div", { class: `ex-row ex-row-${r.key}` }, strip);
-          el("span", { class: "ex-row-label", text: r.label }, row);
+          el("span", { class: "ex-row-label", text: r.key === "open" ? x.model : r.label }, row);
           x.frames[r.key].forEach((src, i) => setFrameImage(el("img", { alt: `${x.model}, frame ${x.keyframes[i]}: ${r.label.toLowerCase()}`, loading: "lazy", decoding: "async" }, row), src, 120));
         }
       }
@@ -73,7 +73,7 @@
     });
 
     const e = x.errors;
-    el("p", { class: "ex-nums", html: `Scene ${x.scene}. Mean position error <span class="r-open">${fmt(e.open)}</span> run as usual, <span class="r-reaim">${fmt(e.reaim)}</span> with re-aiming alone, <span class="r-ours">${fmt(e.ours)}</span> with RGC.` + (x.worse ? " The RGC run follows the plan until about frame 330, then runs past its end and loses the scene." : "") }, card);
+    el("p", { class: "ex-nums", html: `Scene ${x.scene}. Mean position error: <span class="r-open">World model: ${fmt(e.open)}</span>, <span class="r-reaim">Re-aim: ${fmt(e.reaim)}</span>, <span class="r-ours">Re-aim + RGC: ${fmt(e.ours)}</span>.` + (x.worse ? " Re-aim + RGC follows the plan until about frame 330, then runs past its end and loses the scene." : "") }, card);
   });
 
   const filters = root.querySelector(".gallery-filters");

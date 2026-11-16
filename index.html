@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Lost in Generation: Training-Free Re-Aiming for Camera Control in Autoregressive Video World Models</title>
-  <meta name="description" content="Training-free camera feedback for autoregressive video world models, evaluated on eight released models.">
+  <meta name="description" content="Re-aim: training-free camera control for autoregressive video world models, evaluated on eight models.">
   <meta property="og:title" content="Lost in Generation: Training-Free Re-Aiming for Camera Control in Autoregressive Video World Models">
-  <meta property="og:description" content="Training-free camera feedback for autoregressive video world models.">
-  <meta property="og:image" content="assets/img/fig_setup.png">
+  <meta property="og:description" content="Re-aim: training-free camera control for autoregressive video world models.">
+  <meta property="og:image" content="assets/img/fig_setup.svg">
   <meta property="og:type" content="website">
   <meta name="theme-color" content="#101c30">
   <meta name="twitter:card" content="summary_large_image">
@@ -70,7 +70,7 @@
         <div class="scene-summary">
           <div class="scene-identity"><h3 class="scene-model">SANA-WM</h3><p class="scene-caption"></p></div>
           <div class="scene-summary-actions">
-            <div class="scene-improvement"><output class="scene-gain">79×</output><span class="scene-gain-label">lower position error vs. the released model in this scene</span></div>
+            <div class="scene-improvement"><output class="scene-gain">79×</output><span class="scene-gain-label">lower position error vs. World model in this scene</span></div>
             <button class="demo-fullscreen" type="button" aria-pressed="false" hidden><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7 3H3v4m10-4h4v4M3 13v4h4m10-4v4h-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Full screen</span></button>
           </div>
         </div>
@@ -108,17 +108,17 @@
 
           <div class="screens">
             <div class="comparison-controls" role="group" aria-label="Choose comparison">
-              <button class="comparison-btn" type="button" data-base="open" aria-pressed="true">Released vs. feedback</button>
-              <button class="comparison-btn" type="button" data-base="reaim" aria-pressed="false">Re-aim alone vs. +RGC</button>
+              <button class="comparison-btn" type="button" data-base="open" aria-pressed="true">World model vs. Re-aim + RGC</button>
+              <button class="comparison-btn" type="button" data-base="reaim" aria-pressed="false">Re-aim vs. Re-aim + RGC</button>
             </div>
             <div class="screen-grid" hidden></div>
             <div class="wipe">
               <div class="wipe-media">
                 <span class="wipe-line" aria-hidden="true"></span>
-                <span class="tag tag-open w-tag-l">Released model</span>
+                <span class="tag tag-open w-tag-l">World model</span>
                 <span class="tag tag-ours w-tag-r">Re-aim + RGC</span>
                 <figure class="inset"><figcaption class="tag tag-target">Recording</figcaption></figure>
-                <input class="wipe-range" type="range" min="0" max="100" value="50" aria-label="Move the divide between the released model and ours">
+                <input class="wipe-range" type="range" min="0" max="100" value="50" aria-label="Move the divider between World model and Re-aim + RGC">
               </div>
             </div>
             <div class="transport">
@@ -138,8 +138,8 @@
 
         <ul class="legend" aria-label="Legend">
           <li><button class="trajectory-toggle" type="button" data-path="plan" aria-pressed="true"><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-plan"/></svg>Planned path</button></li>
-          <li><button class="trajectory-toggle" type="button" data-path="open" aria-pressed="true"><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-open"/></svg>Open loop</button></li>
-          <li><button class="trajectory-toggle" type="button" data-path="reaim" aria-pressed="true"><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-reaim"/></svg>Re-aim alone</button></li>
+          <li><button class="trajectory-toggle" type="button" data-path="open" aria-pressed="true"><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-open"/></svg>World model</button></li>
+          <li><button class="trajectory-toggle" type="button" data-path="reaim" aria-pressed="true"><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-reaim"/></svg>Re-aim</button></li>
           <li><button class="trajectory-toggle" type="button" data-path="ours" aria-pressed="true"><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-ours"/></svg>Re-aim + RGC</button></li>
           <li><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4" class="lg-start"/></svg>Start</li>
           <li><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4" class="lg-mark"/></svg>Current position</li>
@@ -147,7 +147,7 @@
         </div>
         <div class="project-facts" aria-label="Study overview">
           <div><strong>0</strong><span>Generator weight updates</span></div>
-          <div><strong data-model-count>8</strong><span>Released models tested</span></div>
+          <div><strong data-model-count>8</strong><span>World models evaluated</span></div>
           <div><strong>2</strong><span>Benchmarks: DL3DV &amp; RealEstate10K</span></div>
         </div>
       </div>
@@ -156,7 +156,7 @@
     <section class="prose method-section" id="method" aria-labelledby="method-h">
       <div class="wrap section-heading">
         <p class="eyebrow">Method</p>
-        <h2 id="method-h">Camera feedback</h2>
+        <h2 id="method-h">Re-aim</h2>
         <p>After each generated chunk, we estimate the camera pose and use it to re-aim the next commands. The generator weights remain fixed.</p>
       </div>
       <div class="wrap method-overview">
@@ -176,8 +176,8 @@
         </ol>
       </div>
       <figure class="wide-figure wrap-wide">
-        <a class="zoom" href="assets/img/fig_setup.png"><img src="assets/img/fig_setup.png" alt="The loop around a frozen world model: generate a chunk, measure the camera, re-aim the next commands. Right panels: open loop keeps commanding the plan, our commands lead back to it, and RGC shrinks them when the model overshoots." loading="lazy" width="2402" height="820"></a>
-        <figcaption>Feedback loop and camera commands. Open-loop commands are shown in red; corrected commands are shown in blue.</figcaption>
+        <a class="zoom" href="assets/img/fig_setup.svg"><img src="assets/img/fig_setup.svg" alt="Re-aim estimates the generated camera pose and corrects the next commands. The world model follows the planned commands; Re-aim redirects them toward the plan, and RGC reduces their magnitude when the model overshoots." loading="lazy" width="2402" height="820"></a>
+        <figcaption>World model commands are shown in red; Re-aim commands are shown in blue.</figcaption>
       </figure>
     </section>
 
@@ -185,7 +185,7 @@
       <div class="wrap section-heading">
         <p class="eyebrow">Experiments</p>
         <h2 id="examples-h">Qualitative comparisons</h2>
-        <p class="lede">Drag the divider to compare each released model with re-aim + RGC. The inset shows the recorded view at the planned pose. The gallery includes a failure case.</p>
+        <p class="lede">Drag the divider to compare each world model with Re-aim + RGC. The inset shows the recorded view at the planned pose. The gallery includes a failure case.</p>
       </div>
       <div class="wrap-wide">
         <div class="gallery-toolbar">
@@ -205,7 +205,7 @@
       </div>
       <div class="wrap-wide">
         <div class="benchmark-highlights" aria-label="Selected mean position error reductions"></div>
-        <p class="benchmark-scope">Selected DL3DV results: mean position error over 52 scenes, full method versus open loop.</p>
+        <p class="benchmark-scope">Selected DL3DV results: mean position error over 52 scenes, Re-aim + RGC versus World model.</p>
         <div class="chart-panel">
         <div class="chart-panel-heading"><h3>Results by model</h3></div>
         <div class="chart-controls" role="radiogroup" aria-label="Metric"></div>
@@ -214,7 +214,7 @@
         <details class="table-details">
           <summary>Full results table</summary>
           <div class="table-scroll"><table class="results-table"></table></div>
-          <p class="table-note">WorldScore image aspects were scored for open loop and the full method only. VMem uses feedback through its pose memory instead of re-aiming alone.</p>
+          <p class="table-note">WorldScore image aspects were scored for World model and Re-aim + RGC only. VMem uses pose memory updates rather than Re-aim.</p>
         </details>
         </div>
       </div>
@@ -224,10 +224,10 @@
       <div class="wrap section-heading">
         <p class="eyebrow">Rollout analysis</p>
         <h2 id="drift">Position error over time</h2>
-        <p>In open loop, each new chunk is conditioned on the commanded pose, even when the generated camera has drifted. Camera feedback reduces the resulting accumulation of position error.</p>
+        <p>The world model conditions each new chunk on the commanded pose, even when the generated camera has drifted. Re-aim uses the measured pose to reduce the resulting accumulation of position error.</p>
       </div>
       <figure class="wide-figure wrap-wide">
-        <a class="zoom" href="assets/img/fig_time_compact.png"><img src="assets/img/fig_time_compact.png" alt="Position error over time for six models, comparing open loop, re-aiming, and re-aim + RGC on a shared logarithmic axis." loading="lazy" width="2407" height="399"></a>
+        <a class="zoom" href="assets/img/fig_time_compact.svg"><img src="assets/img/fig_time_compact.svg" alt="Position error over time for six models, comparing World model, Re-aim, and Re-aim + RGC on a shared logarithmic axis." loading="lazy" width="2400" height="398"></a>
         <figcaption>Position error per frame: median over scenes (line) and middle half (band).</figcaption>
       </figure>
     </section>
@@ -235,8 +235,8 @@
     <section class="prose sim" id="sim" aria-labelledby="sim-h">
       <div class="wrap section-heading">
         <p class="eyebrow">Analysis</p>
-        <h2 id="sim-h">Feedback simulation</h2>
-        <p>A 2D camera follows a planned path in 24-frame chunks. Adjust the motion gain, direction error, and measurement noise to compare open loop, re-aiming, and RGC.</p>
+        <h2 id="sim-h">Re-aim simulation</h2>
+        <p>A 2D camera follows a planned path in 24-frame chunks. Adjust the motion gain, direction error, and measurement noise to compare World model, Re-aim, and Re-aim + RGC.</p>
       </div>
       <div class="wrap-wide">
         <div class="sim-presets" role="radiogroup" aria-label="Kind of model"></div>
@@ -248,7 +248,7 @@
               <input class="sim-scrub scrub" type="range" min="0" max="480" step="1" value="480" aria-label="Frame of the toy rollout">
             </div>
             <div class="sim-toggles" role="group" aria-label="Show or hide">
-              <button class="sim-toggle" type="button" data-arm="open" aria-pressed="true"><i class="key key-open"></i>Open loop</button>
+              <button class="sim-toggle" type="button" data-arm="open" aria-pressed="true"><i class="key key-open"></i>World model</button>
               <button class="sim-toggle" type="button" data-arm="reaim" aria-pressed="true"><i class="key key-reaim"></i>Re-aim</button>
               <button class="sim-toggle" type="button" data-arm="rgc" aria-pressed="true"><i class="key key-ours"></i>Re-aim + RGC</button>
             </div>
@@ -303,7 +303,7 @@
   </footer>
 
   <dialog class="figure-dialog" aria-label="Enlarged paper figure">
-    <div class="figure-dialog-toolbar"><span>Paper figure</span><a class="figure-original" href="assets/img/fig_setup.png" target="_blank" rel="noopener">Open original ↗</a><button type="button" class="figure-close" aria-label="Close enlarged figure">Close <span aria-hidden="true">×</span></button></div>
+    <div class="figure-dialog-toolbar"><span>Paper figure</span><a class="figure-original" href="assets/img/fig_setup.svg" target="_blank" rel="noopener">Open figure ↗</a><button type="button" class="figure-close" aria-label="Close enlarged figure">Close <span aria-hidden="true">×</span></button></div>
     <img class="figure-dialog-image" alt="">
   </dialog>
 
@@ -311,10 +311,10 @@
   <script src="assets/js/frames.js?v=1"></script>
   <script src="assets/js/videos.js"></script>
   <script src="assets/js/common.js?v=high-res-1"></script>
-  <script src="assets/js/player.js?v=high-res-1"></script>
-  <script src="assets/js/sim.js"></script>
-  <script src="assets/js/results.js"></script>
-  <script src="assets/js/examples.js?v=high-res-1"></script>
+  <script src="assets/js/player.js?v=names-1"></script>
+  <script src="assets/js/sim.js?v=names-1"></script>
+  <script src="assets/js/results.js?v=names-1"></script>
+  <script src="assets/js/examples.js?v=names-1"></script>
   <script src="assets/js/presentation.js?v=2"></script>
 </body>
 </html>

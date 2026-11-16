@@ -11,9 +11,9 @@
 
   const RUNS = [
     { key: "target", label: "Recording at the planned pose", short: "Recording" },
-    { key: "open", label: "Released model, run as usual", short: "Released model" },
-    { key: "reaim", label: "Ours: re-aim alone", short: "Re-aim alone" },
-    { key: "ours", label: "Ours: re-aim + RGC", short: "Re-aim + RGC" },
+    { key: "open", label: "World model", short: "World model" },
+    { key: "reaim", label: "Re-aim", short: "Re-aim" },
+    { key: "ours", label: "Re-aim + RGC", short: "Re-aim + RGC" },
   ];
   const PATHS = ["open", "reaim", "ours"];
 
@@ -52,7 +52,7 @@
   const pathToggles = root.querySelectorAll(".trajectory-toggle");
   const fitButtons = root.querySelectorAll(".map-fit");
   const mapRuns = ["plan", ...PATHS];
-  const mapLabels = { plan: "Planned path", open: "Open loop", reaim: "Re-aim alone", ours: "Re-aim + RGC" };
+  const mapLabels = { plan: "Planned path", open: "World model", reaim: "Re-aim", ours: "Re-aim + RGC" };
   const hiddenPaths = new Set();
   let mapTracks = {}, fitMode = "all", mapSize = 1000, dragPointer = null, dragRun = null, hoveredRun = null;
 
@@ -211,7 +211,7 @@
     svg.classList.add("is-highlighting");
     svg.querySelectorAll(`.trajectory-track[data-path="${hit.run}"]`).forEach((g) => g.classList.add("is-highlighted"));
     const frame = cur.video ? hit.frame : cur.keyframes[hit.frame];
-    mapTip.textContent = `${mapLabels[hit.run]} · ${cur.video ? "" : "≈ "}frame ${frame}`;
+    mapTip.textContent = `${hit.run === "open" ? cur.model : mapLabels[hit.run]} · ${cur.video ? "" : "≈ "}frame ${frame}`;
     const box = svg.getBoundingClientRect();
     mapTip.style.left = Math.max(78, Math.min(box.width - 78, e.clientX - box.left)) + "px";
     mapTip.style.top = Math.max(35, e.clientY - box.top - 12) + "px";
@@ -305,7 +305,7 @@
       const tile = el("figure", { class: "tile", "data-run": r.key }, grid);
       const m = makeMedia(s, r.key, k);
       tile.appendChild(m);
-      el("figcaption", { class: "tag tag-" + r.key, text: r.short }, tile);
+      el("figcaption", { class: "tag tag-" + r.key, text: r.key === "open" ? s.model : r.short }, tile);
       media[r.key] = m;
     }
     buildWipe(s);
@@ -324,11 +324,11 @@
   }
 
   function updateWipeLabels() {
-    const label = RUNS.find((r) => r.key === comparisonBase).short;
+    const label = comparisonBase === "open" ? cur.model : "Re-aim";
     const tag = wipeMedia.querySelector(".w-tag-l");
     tag.className = `tag tag-${comparisonBase} w-tag-l`;
     tag.textContent = label;
-    wipeRange.setAttribute("aria-label", `Move the divide between ${label.toLowerCase()} and re-aim + RGC`);
+    wipeRange.setAttribute("aria-label", `Move the divider between ${label} and Re-aim + RGC`);
     comparisonButtons.forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.base === comparisonBase)));
   }
 
@@ -436,7 +436,7 @@
     const ratio = cur.errors[comparisonBase] / cur.errors.ours;
     const factor = comparisonFactor(cur);
     const better = ratio >= 1;
-    const baseline = comparisonBase === "open" ? "the released model" : "re-aiming alone";
+    const baseline = comparisonBase === "open" ? cur.model : "Re-aim";
     root.querySelector(".scene-gain").textContent = better ? `${factor}×` : "Higher error";
     root.querySelector(".scene-gain-label").textContent = better ? `lower position error vs. ${baseline} in this scene` : `Higher position error than ${baseline} in this scene`;
     root.querySelector(".scene-improvement").classList.toggle("is-failure", !better);
@@ -490,10 +490,10 @@
     updateComparisonStats();
     readout.innerHTML =
       `<strong>${cur.model}</strong>, scene ${cur.scene}. Mean position error ` +
-      `<span class="r-open">${fmt(e.open)}</span> run as usual, ` +
-      `<span class="r-reaim">${fmt(e.reaim)}</span> with re-aiming alone, ` +
-      `<span class="r-ours">${fmt(e.ours)}</span> with RGC` +
-      (better ? `: <span class="r-factor">${f}× lower</span>.` : `. Here feedback does not help.`);
+      `<span class="r-open">World model: ${fmt(e.open)}</span>, ` +
+      `<span class="r-reaim">Re-aim: ${fmt(e.reaim)}</span>, ` +
+      `<span class="r-ours">Re-aim + RGC: ${fmt(e.ours)}</span>` +
+      (better ? `: <span class="r-factor">${f}× lower</span>.` : `. Re-aim + RGC increases the error in this scene.`);
     if (wasPlaying || !userTouched) setPlaying(wasPlaying);
   }
 

@@ -2,7 +2,7 @@
 
    The camera should follow a curved plan of 480 frames, generated in chunks of 24. The "model" moves gain times as far
    as each command asks, turned by a fixed angle. Three ways to command it:
-   - open loop:  command the plan
+   - world model:  command the plan
    - re-aim:     after each chunk, measure the camera (with optional noise), aim a path from there back to the plan by
                  the end of the next chunk, and send that motion from the pose the model believes it is at
    - RGC:        as re-aim, but divide the motion by the projected gain estimated so far, never by less than one
@@ -13,7 +13,7 @@
 
   const N = 480, CH = 24;
   const ARMS = [
-    { key: "open", label: "Open loop" },
+    { key: "open", label: "World model" },
     { key: "reaim", label: "Re-aim" },
     { key: "rgc", label: "Re-aim + RGC" },
   ];

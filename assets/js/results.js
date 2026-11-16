@@ -8,10 +8,10 @@ const METRICS = [
   { key: "ws_camera", label: "WorldScore camera", lower: false, log: false, note: "WorldScore camera control, which fits a scale to the plan first. Higher is better." },
 ];
 const RUNS = [
-  { key: "open", label: "Open loop", cls: "c-open", color: "var(--open)" },
-  { key: "reaim", label: "Ours: re-aim", cls: "c-reaim", color: "var(--reaim)" },
-  { key: "full", label: "Ours: re-aim + RGC", cls: "c-full", color: "var(--ours)" },
-  { key: "memory", label: "Ours: poses in memory", cls: "c-full", color: "var(--ours)" },
+  { key: "open", label: "World model", cls: "c-open", color: "var(--open)" },
+  { key: "reaim", label: "Re-aim", cls: "c-reaim", color: "var(--reaim)" },
+  { key: "full", label: "Re-aim + RGC", cls: "c-full", color: "var(--ours)" },
+  { key: "memory", label: "Pose memory", cls: "c-full", color: "var(--ours)" },
 ];
 
 const chart = document.querySelector(".chart");
@@ -29,7 +29,7 @@ function drawChart(mi) {
   current = mi;
   const M = METRICS[mi];
   controls.querySelectorAll(".metric").forEach((b, k) => b.setAttribute("aria-checked", String(k === mi)));
-  note.textContent = M.note + " Blue: our full method. Green: re-aiming alone.";
+  note.textContent = M.note + " Red: World model. Green: Re-aim. Blue: Re-aim + RGC (pose memory for VMem).";
   chart.querySelectorAll("svg").forEach((n) => n.remove());
 
   const rows = D.results;
