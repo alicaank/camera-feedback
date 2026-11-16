@@ -1,6 +1,6 @@
-# Lost in Generation
+# Taking the Road Not Taken
 
-Static page for "Lost in Generation: Training-Free Re-Aiming for Camera Control in Autoregressive Video World Models". No build step, no external requests: fonts, figures and data are all in this folder.
+Static page for "Taking the Road Not Taken: Correcting Trajectory Drift in Frozen Video World Models". No build step, no external requests: fonts, figures and data are all in this folder.
 
 ## Deploy on GitHub Pages
 
