@@ -7,13 +7,13 @@
   <meta name="description" content="Re-Aim corrects trajectory drift in frozen video world models without updating generator weights. Explore camera paths, generated views, and results across eight world models.">
   <meta property="og:title" content="Re-Aim: Correcting Trajectory Drift in Frozen Video World Models">
   <meta property="og:description" content="Camera control without retraining. Explore Re-Aim through interactive trajectories, generated views, and results across eight world models.">
-  <meta property="og:image" content="assets/img/fig_setup.svg">
+  <meta property="og:image" content="assets/img/reaim-teaser.webp">
   <meta property="og:type" content="website">
   <meta name="theme-color" content="#101c30">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/css/style.css?v=trajectory-1">
-  <link rel="stylesheet" href="assets/css/presentation.css?v=reaim-2">
+  <link rel="stylesheet" href="assets/css/presentation.css?v=paper-cover-1">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -37,34 +37,27 @@
 
   <header class="masthead" id="top">
     <div class="wrap masthead-layout">
-      <div class="masthead-copy">
-      <p class="venue" data-config="venue">CVPR 2027 submission</p>
-      <h1 class="title">
-        <span class="title-main">Re-Aim<span class="title-colon">:</span></span>
-        <span class="title-sub">Correcting Trajectory Drift<br class="title-break"> in Frozen Video World Models</span>
-      </h1>
-      <p class="masthead-note">Camera control without updating the generator.</p>
-      <p class="authors" data-config="authors">Anonymous authors</p>
-      <nav class="links" aria-label="Paper links">
-        <a class="link link-primary" href="#watch"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 8 6-8 6z"/></svg>Explore the demo</a>
-        <a class="link" data-link="paper" href="#">Paper</a>
-        <a class="link" data-link="arxiv" href="#">arXiv</a>
-        <a class="link" data-link="code" href="#">Code</a>
-        <a class="link" href="#bibtex"><span aria-hidden="true">{ }</span>BibTeX</a>
-      </nav>
+      <div class="cover-copy">
+        <p class="cover-credit">Anonymous authors <span>·</span> CVPR 2027 submission</p>
+        <h1><span class="cover-name">Re-Aim<span class="title-colon">:</span></span>
+          <span class="cover-subtitle">Correcting Trajectory Drift in Frozen Video World Models</span></h1>
+        <p class="cover-description">After each chunk of video, Re-Aim measures where the camera went and adjusts the next command to bring it back to the planned path.</p>
+        <nav class="cover-actions" aria-label="Project resources">
+          <a class="cover-demo" href="#watch">Explore this scene <span aria-hidden="true">↓</span></a>
+          <a href="#method">How it works</a>
+          <a href="#bibtex">BibTeX</a>
+        </nav>
       </div>
-      <figure class="hero-preview" aria-labelledby="hero-preview-caption">
-        <div class="preview-heading"><span>Same scene. Same planned path.</span><span>Frame 480</span></div>
-        <div class="preview-frames">
-          <div class="preview-frame"><span class="preview-label preview-label-model">World model</span><img data-hero-frame="open" alt="SANA-WM generated view at frame 480" width="1280" height="704" decoding="async"></div>
-          <div class="preview-frame"><span class="preview-label preview-label-reaim">Re-Aim + RGC</span><img data-hero-frame="ours" alt="SANA-WM generated view with Re-Aim and RGC at frame 480" width="1280" height="704" decoding="async"></div>
+      <figure class="cover-scene">
+        <div class="cover-image"><img id="cover-frame" src="assets/frames/matrixgame_9bc29652_ours_480.jpg" width="1280" height="704" fetchpriority="high" alt="Re-Aim + RGC follows the staircase at frame 480"></div>
+        <div class="cover-controls" role="group" aria-label="Choose the view at frame 480">
+          <button type="button" data-cover-run="open" aria-pressed="false">World model</button>
+          <button type="button" data-cover-run="ours" aria-pressed="true">Re-Aim + RGC</button>
+          <button type="button" data-cover-run="target" aria-pressed="false">Recording</button>
         </div>
-        <div class="preview-paths">
-          <div class="preview-path-heading"><span>Camera paths from above</span><span aria-hidden="true">↗</span></div>
-          <svg class="hero-path-art" role="img" aria-labelledby="hero-path-title" focusable="false"><title id="hero-path-title">SANA-WM camera trajectories: the world model drifts away, while Re-Aim with RGC follows the planned path.</title></svg>
-          <div class="preview-legend"><span class="preview-key-plan">Planned path</span><span class="preview-key-open">World model</span><span class="preview-key-ours">Re-Aim + RGC</span></div>
-        </div>
-        <figcaption id="hero-preview-caption"><span data-hero-scene>SANA-WM · Scene e8348699</span><a href="#watch">Explore this scene <span aria-hidden="true">↓</span></a></figcaption>
+        <figcaption><span>Matrix-Game 3.5 <span aria-hidden="true">/</span> Frame 480</span>
+          <a class="zoom" href="assets/img/reaim-teaser.webp" data-alt="Paper teaser showing the generation steps, staircase views, measured camera paths, and results across eight models.">View full teaser <span aria-hidden="true">↗</span></a>
+        </figcaption>
       </figure>
     </div>
   </header>
@@ -170,10 +163,14 @@
 
     <section class="prose method-section" id="method" aria-labelledby="method-h">
       <div class="wrap section-heading">
-        <p class="eyebrow"><span class="section-number">01</span> Method</p>
+        <p class="eyebrow">Method</p>
         <h2 id="method-h">Correct the next<br>camera command</h2>
         <p>After each generated chunk, we estimate the camera pose and use it to re-aim the next commands. The generator weights remain fixed.</p>
       </div>
+      <figure class="wide-figure wrap-wide method-diagram">
+        <a class="zoom" href="assets/img/reaim-method.webp"><img src="assets/img/reaim-method.webp" alt="The frozen world model generates a chunk. Re-Aim measures its camera pose, aims the next commands toward the plan, and scales them down when motion gain exceeds one." loading="lazy" width="2900" height="831"></a>
+        <figcaption>Blue arrows carry the corrected camera commands back to the world model. Select the diagram to enlarge it.</figcaption>
+      </figure>
       <div class="wrap method-overview">
         <ol class="steps">
           <li>
@@ -190,15 +187,11 @@
           </li>
         </ol>
       </div>
-      <figure class="wide-figure wrap-wide">
-        <a class="zoom" href="assets/img/fig_setup.svg"><img src="assets/img/fig_setup.svg" alt="Re-Aim estimates the generated camera pose and corrects the next commands. The world model follows the planned commands; Re-Aim redirects them toward the plan, and RGC reduces their magnitude when the model overshoots." loading="lazy" width="2402" height="820"></a>
-        <figcaption>World model commands are shown in red; Re-Aim commands are shown in blue.</figcaption>
-      </figure>
     </section>
 
     <section class="prose" id="examples" aria-labelledby="examples-h">
       <div class="wrap section-heading">
-        <p class="eyebrow"><span class="section-number">02</span> Generated views</p>
+        <p class="eyebrow">Generated views</p>
         <h2 id="examples-h">Compare the views</h2>
         <p class="lede">Drag the divider to compare each world model with Re-Aim + RGC. The inset shows the recorded view at the planned pose. The gallery includes a failure case.</p>
       </div>
@@ -214,7 +207,7 @@
 
     <section class="results" id="results" aria-labelledby="results-h">
       <div class="wrap section-heading">
-        <p class="eyebrow"><span class="section-number">03</span> Evaluation</p>
+        <p class="eyebrow">Evaluation</p>
         <h2 id="results-h">Eight world models.<br>Two benchmarks.</h2>
         <p class="lede">We evaluate six models on 52 DL3DV scenes (480 frames) and two on 30 RealEstate10K clips (240 frames). Position error is measured without aligning the trajectory to the plan.</p>
       </div>
@@ -237,7 +230,7 @@
 
     <section class="prose drift-section" aria-labelledby="drift">
       <div class="wrap section-heading">
-        <p class="eyebrow"><span class="section-number">04</span> Rollout analysis</p>
+        <p class="eyebrow">Rollout analysis</p>
         <h2 id="drift">How drift builds<br>over time</h2>
         <p>The world model conditions each new chunk on the commanded pose, even when the generated camera has drifted. Re-Aim uses the measured pose to reduce the resulting accumulation of position error.</p>
       </div>
@@ -249,7 +242,7 @@
 
     <section class="prose sim" id="sim" aria-labelledby="sim-h">
       <div class="wrap section-heading">
-        <p class="eyebrow"><span class="section-number">05</span> Simulation</p>
+        <p class="eyebrow">Simulation</p>
         <h2 id="sim-h">Try the motion model</h2>
         <p>A 2D camera follows a planned path in 24-frame chunks. Adjust the motion gain, direction error, and measurement noise to compare World model, Re-Aim, and Re-Aim + RGC.</p>
       </div>
@@ -330,6 +323,6 @@
   <script src="assets/js/sim.js?v=reaim-2"></script>
   <script src="assets/js/results.js?v=reaim-2"></script>
   <script src="assets/js/examples.js?v=reaim-2"></script>
-  <script src="assets/js/presentation.js?v=reaim-2"></script>
+  <script src="assets/js/presentation.js?v=paper-cover-1"></script>
 </body>
 </html>

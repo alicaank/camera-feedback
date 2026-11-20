@@ -1,25 +1,20 @@
 /* Presentation enhancements. Numbers and decorative paths use the exported paper data. */
 (function () {
-  const art = document.querySelector(".hero-path-art");
-  if (art && D.player.length) {
-    const scene = D.player[0];
-    const points = ["plan", "open", "ours"].flatMap((run) => scene.paths[run]);
-    const xs = points.map((point) => point[0]), ys = points.map((point) => point[1]);
-    const left = Math.min(...xs) - 65, top = Math.min(...ys) - 65;
-    art.setAttribute("viewBox", `${left} ${top} ${Math.max(...xs) - left + 65} ${Math.max(...ys) - top + 65}`);
-    for (const run of ["plan", "open", "ours"]) {
-      art.appendChild(polyline(scene.paths[run], `hero-art-${run}`));
+  const sceneIndex = D.player.findIndex(scene => scene.key === "matrixgame" && scene.scene === "9bc29652");
+  const coverScene = D.player[sceneIndex];
+  const coverImage = document.getElementById("cover-frame");
+  const coverButtons = document.querySelectorAll("[data-cover-run]");
+  if (coverScene) {
+    function showCover(button) {
+      const run = button.dataset.coverRun;
+      setFrameImage(coverImage, coverScene.frames[run].at(-1));
+      coverImage.alt = button.textContent + " view of the staircase scene at frame 480";
+      coverButtons.forEach(item => item.setAttribute("aria-pressed", String(item === button)));
     }
-    for (const run of ["open", "ours"]) {
-      const [cx, cy] = scene.paths[run].at(-1);
-      el("svg:circle", { cx, cy, r: 9, class: `hero-endpoint hero-endpoint-${run}` }, art);
-    }
-    document.querySelectorAll("[data-hero-frame]").forEach((image) => {
-      setFrameImage(image, scene.frames[image.dataset.heroFrame].at(-1), 250);
-    });
-    document.querySelector("[data-hero-scene]").textContent = `${scene.model} · Scene ${scene.scene}`;
-    document.querySelector(".hero-preview figcaption a").addEventListener("click", () => {
-      document.querySelector("#watch .pick")?.click();
+    coverButtons.forEach(button => button.addEventListener("click", () => showCover(button)));
+    showCover(document.querySelector('[data-cover-run="ours"]'));
+    document.querySelector(".cover-demo").addEventListener("click", () => {
+      document.querySelectorAll("#watch .pick")[sceneIndex].click();
     });
   }
   document.querySelectorAll("[data-model-count]").forEach((node) => { node.textContent = D.results.length; });
@@ -72,7 +67,7 @@
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || typeof dialog.showModal !== "function") return;
     event.preventDefault();
     image.src = link.href;
-    image.alt = link.querySelector("img").alt;
+    image.alt = link.dataset.alt || link.querySelector("img").alt;
     dialog.querySelector(".figure-original").href = link.href;
     dialog.showModal();
   }));
