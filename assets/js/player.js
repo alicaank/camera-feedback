@@ -12,8 +12,8 @@
   const RUNS = [
     { key: "target", label: "Recording at the planned pose", short: "Recording" },
     { key: "open", label: "World model", short: "World model" },
-    { key: "reaim", label: "Re-aim", short: "Re-aim" },
-    { key: "ours", label: "Re-aim + RGC", short: "Re-aim + RGC" },
+    { key: "reaim", label: "Re-Aim", short: "Re-Aim" },
+    { key: "ours", label: "Re-Aim + RGC", short: "Re-Aim + RGC" },
   ];
   const PATHS = ["open", "reaim", "ours"];
 
@@ -52,7 +52,7 @@
   const pathToggles = root.querySelectorAll(".trajectory-toggle");
   const fitButtons = root.querySelectorAll(".map-fit");
   const mapRuns = ["plan", ...PATHS];
-  const mapLabels = { plan: "Planned path", open: "World model", reaim: "Re-aim", ours: "Re-aim + RGC" };
+  const mapLabels = { plan: "Planned path", open: "World model", reaim: "Re-Aim", ours: "Re-Aim + RGC" };
   const hiddenPaths = new Set();
   let mapTracks = {}, fitMode = "all", mapSize = 1000, dragPointer = null, dragRun = null, hoveredRun = null;
 
@@ -324,11 +324,11 @@
   }
 
   function updateWipeLabels() {
-    const label = comparisonBase === "open" ? cur.model : "Re-aim";
+    const label = comparisonBase === "open" ? cur.model : "Re-Aim";
     const tag = wipeMedia.querySelector(".w-tag-l");
     tag.className = `tag tag-${comparisonBase} w-tag-l`;
     tag.textContent = label;
-    wipeRange.setAttribute("aria-label", `Move the divider between ${label} and Re-aim + RGC`);
+    wipeRange.setAttribute("aria-label", `Move the divider between ${label} and Re-Aim + RGC`);
     comparisonButtons.forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.base === comparisonBase)));
   }
 
@@ -436,7 +436,7 @@
     const ratio = cur.errors[comparisonBase] / cur.errors.ours;
     const factor = comparisonFactor(cur);
     const better = ratio >= 1;
-    const baseline = comparisonBase === "open" ? cur.model : "Re-aim";
+    const baseline = comparisonBase === "open" ? cur.model : "Re-Aim";
     root.querySelector(".scene-gain").textContent = better ? `${factor}×` : "Higher error";
     root.querySelector(".scene-gain-label").textContent = better ? `lower position error vs. ${baseline} in this scene` : `Higher position error than ${baseline} in this scene`;
     root.querySelector(".scene-improvement").classList.toggle("is-failure", !better);
@@ -491,9 +491,9 @@
     readout.innerHTML =
       `<strong>${cur.model}</strong>, scene ${cur.scene}. Mean position error ` +
       `<span class="r-open">World model: ${fmt(e.open)}</span>, ` +
-      `<span class="r-reaim">Re-aim: ${fmt(e.reaim)}</span>, ` +
-      `<span class="r-ours">Re-aim + RGC: ${fmt(e.ours)}</span>` +
-      (better ? `: <span class="r-factor">${f}× lower</span>.` : `. Re-aim + RGC increases the error in this scene.`);
+      `<span class="r-reaim">Re-Aim: ${fmt(e.reaim)}</span>, ` +
+      `<span class="r-ours">Re-Aim + RGC: ${fmt(e.ours)}</span>` +
+      (better ? `: <span class="r-factor">${f}× lower</span>.` : `. Re-Aim + RGC increases the error in this scene.`);
     if (wasPlaying || !userTouched) setPlaying(wasPlaying);
   }
 

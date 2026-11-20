@@ -14,8 +14,8 @@
   const N = 480, CH = 24;
   const ARMS = [
     { key: "open", label: "World model" },
-    { key: "reaim", label: "Re-aim" },
-    { key: "rgc", label: "Re-aim + RGC" },
+    { key: "reaim", label: "Re-Aim" },
+    { key: "rgc", label: "Re-Aim + RGC" },
   ];
   const PRESETS = {
     far: { label: "Moves too far", gain: 1.7, turn: 0, noise: 0.04 },

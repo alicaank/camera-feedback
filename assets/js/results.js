@@ -9,8 +9,8 @@ const METRICS = [
 ];
 const RUNS = [
   { key: "open", label: "World model", cls: "c-open", color: "var(--open)" },
-  { key: "reaim", label: "Re-aim", cls: "c-reaim", color: "var(--reaim)" },
-  { key: "full", label: "Re-aim + RGC", cls: "c-full", color: "var(--ours)" },
+  { key: "reaim", label: "Re-Aim", cls: "c-reaim", color: "var(--reaim)" },
+  { key: "full", label: "Re-Aim + RGC", cls: "c-full", color: "var(--ours)" },
   { key: "memory", label: "Pose memory", cls: "c-full", color: "var(--ours)" },
 ];
 
@@ -29,7 +29,7 @@ function drawChart(mi) {
   current = mi;
   const M = METRICS[mi];
   controls.querySelectorAll(".metric").forEach((b, k) => b.setAttribute("aria-checked", String(k === mi)));
-  note.textContent = M.note + " Red: World model. Green: Re-aim. Blue: Re-aim + RGC (pose memory for VMem).";
+  note.textContent = M.note + " Red: World model. Green: Re-Aim. Blue: Re-Aim + RGC (pose memory for VMem).";
   chart.querySelectorAll("svg").forEach((n) => n.remove());
 
   const rows = D.results;

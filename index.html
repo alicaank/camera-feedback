@@ -3,17 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Taking the Road Not Taken: Correcting Trajectory Drift in Frozen Video World Models</title>
-  <meta name="description" content="Re-aim corrects trajectory drift in frozen video world models without updating generator weights.">
-  <meta property="og:title" content="Taking the Road Not Taken: Correcting Trajectory Drift in Frozen Video World Models">
-  <meta property="og:description" content="Re-aim corrects trajectory drift in frozen video world models without updating generator weights.">
+  <title>Re-Aim: Correcting Trajectory Drift in Frozen Video World Models</title>
+  <meta name="description" content="Re-Aim corrects trajectory drift in frozen video world models without updating generator weights. Explore camera paths, generated views, and results across eight world models.">
+  <meta property="og:title" content="Re-Aim: Correcting Trajectory Drift in Frozen Video World Models">
+  <meta property="og:description" content="Camera control without retraining. Explore Re-Aim through interactive trajectories, generated views, and results across eight world models.">
   <meta property="og:image" content="assets/img/fig_setup.svg">
   <meta property="og:type" content="website">
   <meta name="theme-color" content="#101c30">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/css/style.css?v=trajectory-1">
-  <link rel="stylesheet" href="assets/css/presentation.css?v=road-title-1">
+  <link rel="stylesheet" href="assets/css/presentation.css?v=reaim-2">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -22,7 +22,7 @@
     <div class="wrap-wide nav-inner">
       <a class="wordmark" href="#top">
         <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M5 26 12 19 9 11 27 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 4"/><path d="m5 26 8-5 5-9 9-7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5" cy="26" r="3" fill="currentColor"/><circle cx="27" cy="5" r="3" fill="currentColor"/></svg>
-        <span>Taking the Road Not Taken</span>
+        <span>Re-Aim</span>
       </a>
       <div class="section-links">
         <a href="#watch">Demo</a>
@@ -36,21 +36,36 @@
   </nav>
 
   <header class="masthead" id="top">
-    <svg class="hero-path-art" viewBox="-100 200 1150 650" aria-hidden="true" focusable="false"></svg>
-    <div class="wrap">
+    <div class="wrap masthead-layout">
+      <div class="masthead-copy">
       <p class="venue" data-config="venue">CVPR 2027 submission</p>
       <h1 class="title">
-        <span class="title-main">Taking the Road Not Taken: Correcting Trajectory Drift</span>
-        <span class="title-sub">in Frozen Video World Models</span>
+        <span class="title-main">Re-Aim<span class="title-colon">:</span></span>
+        <span class="title-sub">Correcting Trajectory Drift<br class="title-break"> in Frozen Video World Models</span>
       </h1>
+      <p class="masthead-note">Camera control without updating the generator.</p>
       <p class="authors" data-config="authors">Anonymous authors</p>
       <nav class="links" aria-label="Paper links">
-        <a class="link link-primary" href="#watch"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 8 6-8 6z"/></svg>View demo</a>
+        <a class="link link-primary" href="#watch"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 8 6-8 6z"/></svg>Explore the demo</a>
         <a class="link" data-link="paper" href="#">Paper</a>
         <a class="link" data-link="arxiv" href="#">arXiv</a>
         <a class="link" data-link="code" href="#">Code</a>
         <a class="link" href="#bibtex"><span aria-hidden="true">{ }</span>BibTeX</a>
       </nav>
+      </div>
+      <figure class="hero-preview" aria-labelledby="hero-preview-caption">
+        <div class="preview-heading"><span>Same scene. Same planned path.</span><span>Frame 480</span></div>
+        <div class="preview-frames">
+          <div class="preview-frame"><span class="preview-label preview-label-model">World model</span><img data-hero-frame="open" alt="SANA-WM generated view at frame 480" width="1280" height="704" decoding="async"></div>
+          <div class="preview-frame"><span class="preview-label preview-label-reaim">Re-Aim + RGC</span><img data-hero-frame="ours" alt="SANA-WM generated view with Re-Aim and RGC at frame 480" width="1280" height="704" decoding="async"></div>
+        </div>
+        <div class="preview-paths">
+          <div class="preview-path-heading"><span>Camera paths from above</span><span aria-hidden="true">↗</span></div>
+          <svg class="hero-path-art" role="img" aria-labelledby="hero-path-title" focusable="false"><title id="hero-path-title">SANA-WM camera trajectories: the world model drifts away, while Re-Aim with RGC follows the planned path.</title></svg>
+          <div class="preview-legend"><span class="preview-key-plan">Planned path</span><span class="preview-key-open">World model</span><span class="preview-key-ours">Re-Aim + RGC</span></div>
+        </div>
+        <figcaption id="hero-preview-caption"><span data-hero-scene>SANA-WM · Scene e8348699</span><a href="#watch">Explore this scene <span aria-hidden="true">↓</span></a></figcaption>
+      </figure>
     </div>
   </header>
 
@@ -61,8 +76,8 @@
         <div class="demo-panel">
         <div class="demo-intro">
           <div>
-            <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span>Demo</p>
-            <h2>Camera control examples</h2>
+            <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span>Interactive demo</p>
+            <h2>Follow the camera</h2>
           </div>
           <p class="hero-lead">Drag the divider to compare outputs, or select a frame on the camera trajectory.</p>
         </div>
@@ -108,17 +123,17 @@
 
           <div class="screens">
             <div class="comparison-controls" role="group" aria-label="Choose comparison">
-              <button class="comparison-btn" type="button" data-base="open" aria-pressed="true">World model vs. Re-aim + RGC</button>
-              <button class="comparison-btn" type="button" data-base="reaim" aria-pressed="false">Re-aim vs. Re-aim + RGC</button>
+              <button class="comparison-btn" type="button" data-base="open" aria-pressed="true">World model vs. Re-Aim + RGC</button>
+              <button class="comparison-btn" type="button" data-base="reaim" aria-pressed="false">Re-Aim vs. Re-Aim + RGC</button>
             </div>
             <div class="screen-grid" hidden></div>
             <div class="wipe">
               <div class="wipe-media">
                 <span class="wipe-line" aria-hidden="true"></span>
                 <span class="tag tag-open w-tag-l">World model</span>
-                <span class="tag tag-ours w-tag-r">Re-aim + RGC</span>
+                <span class="tag tag-ours w-tag-r">Re-Aim + RGC</span>
                 <figure class="inset"><figcaption class="tag tag-target">Recording</figcaption></figure>
-                <input class="wipe-range" type="range" min="0" max="100" value="50" aria-label="Move the divider between World model and Re-aim + RGC">
+                <input class="wipe-range" type="range" min="0" max="100" value="50" aria-label="Move the divider between World model and Re-Aim + RGC">
               </div>
             </div>
             <div class="transport">
@@ -139,8 +154,8 @@
         <ul class="legend" aria-label="Legend">
           <li><button class="trajectory-toggle" type="button" data-path="plan" aria-pressed="true"><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-plan"/></svg>Planned path</button></li>
           <li><button class="trajectory-toggle" type="button" data-path="open" aria-pressed="true"><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-open"/></svg>World model</button></li>
-          <li><button class="trajectory-toggle" type="button" data-path="reaim" aria-pressed="true"><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-reaim"/></svg>Re-aim</button></li>
-          <li><button class="trajectory-toggle" type="button" data-path="ours" aria-pressed="true"><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-ours"/></svg>Re-aim + RGC</button></li>
+          <li><button class="trajectory-toggle" type="button" data-path="reaim" aria-pressed="true"><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-reaim"/></svg>Re-Aim</button></li>
+          <li><button class="trajectory-toggle" type="button" data-path="ours" aria-pressed="true"><svg width="28" height="10" aria-hidden="true"><line x1="1" y1="5" x2="27" y2="5" class="lg-ours"/></svg>Re-Aim + RGC</button></li>
           <li><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4" class="lg-start"/></svg>Start</li>
           <li><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4" class="lg-mark"/></svg>Current position</li>
         </ul>
@@ -155,8 +170,8 @@
 
     <section class="prose method-section" id="method" aria-labelledby="method-h">
       <div class="wrap section-heading">
-        <p class="eyebrow">Method</p>
-        <h2 id="method-h">Re-aim</h2>
+        <p class="eyebrow"><span class="section-number">01</span> Method</p>
+        <h2 id="method-h">Correct the next<br>camera command</h2>
         <p>After each generated chunk, we estimate the camera pose and use it to re-aim the next commands. The generator weights remain fixed.</p>
       </div>
       <div class="wrap method-overview">
@@ -176,16 +191,16 @@
         </ol>
       </div>
       <figure class="wide-figure wrap-wide">
-        <a class="zoom" href="assets/img/fig_setup.svg"><img src="assets/img/fig_setup.svg" alt="Re-aim estimates the generated camera pose and corrects the next commands. The world model follows the planned commands; Re-aim redirects them toward the plan, and RGC reduces their magnitude when the model overshoots." loading="lazy" width="2402" height="820"></a>
-        <figcaption>World model commands are shown in red; Re-aim commands are shown in blue.</figcaption>
+        <a class="zoom" href="assets/img/fig_setup.svg"><img src="assets/img/fig_setup.svg" alt="Re-Aim estimates the generated camera pose and corrects the next commands. The world model follows the planned commands; Re-Aim redirects them toward the plan, and RGC reduces their magnitude when the model overshoots." loading="lazy" width="2402" height="820"></a>
+        <figcaption>World model commands are shown in red; Re-Aim commands are shown in blue.</figcaption>
       </figure>
     </section>
 
     <section class="prose" id="examples" aria-labelledby="examples-h">
       <div class="wrap section-heading">
-        <p class="eyebrow">Experiments</p>
-        <h2 id="examples-h">Qualitative comparisons</h2>
-        <p class="lede">Drag the divider to compare each world model with Re-aim + RGC. The inset shows the recorded view at the planned pose. The gallery includes a failure case.</p>
+        <p class="eyebrow"><span class="section-number">02</span> Generated views</p>
+        <h2 id="examples-h">Compare the views</h2>
+        <p class="lede">Drag the divider to compare each world model with Re-Aim + RGC. The inset shows the recorded view at the planned pose. The gallery includes a failure case.</p>
       </div>
       <div class="wrap-wide">
         <div class="gallery-toolbar">
@@ -199,13 +214,13 @@
 
     <section class="results" id="results" aria-labelledby="results-h">
       <div class="wrap section-heading">
-        <p class="eyebrow">Evaluation</p>
-        <h2 id="results-h">Quantitative results</h2>
+        <p class="eyebrow"><span class="section-number">03</span> Evaluation</p>
+        <h2 id="results-h">Eight world models.<br>Two benchmarks.</h2>
         <p class="lede">We evaluate six models on 52 DL3DV scenes (480 frames) and two on 30 RealEstate10K clips (240 frames). Position error is measured without aligning the trajectory to the plan.</p>
       </div>
       <div class="wrap-wide">
         <div class="benchmark-highlights" aria-label="Selected mean position error reductions"></div>
-        <p class="benchmark-scope">Selected DL3DV results: mean position error over 52 scenes, Re-aim + RGC versus World model.</p>
+        <p class="benchmark-scope">Selected DL3DV results: mean position error over 52 scenes, Re-Aim + RGC versus World model.</p>
         <div class="chart-panel">
         <div class="chart-panel-heading"><h3>Results by model</h3></div>
         <div class="chart-controls" role="radiogroup" aria-label="Metric"></div>
@@ -214,7 +229,7 @@
         <details class="table-details">
           <summary>Full results table</summary>
           <div class="table-scroll"><table class="results-table"></table></div>
-          <p class="table-note">WorldScore image aspects were scored for World model and Re-aim + RGC only. VMem uses pose memory updates rather than Re-aim.</p>
+          <p class="table-note">WorldScore image aspects were scored for World model and Re-Aim + RGC only. VMem uses pose memory updates rather than Re-Aim.</p>
         </details>
         </div>
       </div>
@@ -222,21 +237,21 @@
 
     <section class="prose drift-section" aria-labelledby="drift">
       <div class="wrap section-heading">
-        <p class="eyebrow">Rollout analysis</p>
-        <h2 id="drift">Position error over time</h2>
-        <p>The world model conditions each new chunk on the commanded pose, even when the generated camera has drifted. Re-aim uses the measured pose to reduce the resulting accumulation of position error.</p>
+        <p class="eyebrow"><span class="section-number">04</span> Rollout analysis</p>
+        <h2 id="drift">How drift builds<br>over time</h2>
+        <p>The world model conditions each new chunk on the commanded pose, even when the generated camera has drifted. Re-Aim uses the measured pose to reduce the resulting accumulation of position error.</p>
       </div>
       <figure class="wide-figure wrap-wide">
-        <a class="zoom" href="assets/img/fig_time_compact.svg"><img src="assets/img/fig_time_compact.svg" alt="Position error over time for six models, comparing World model, Re-aim, and Re-aim + RGC on a shared logarithmic axis." loading="lazy" width="2400" height="398"></a>
+        <a class="zoom" href="assets/img/fig_time_compact.svg"><img src="assets/img/fig_time_compact.svg" alt="Position error over time for six models, comparing World model, Re-Aim, and Re-Aim + RGC on a shared logarithmic axis." loading="lazy" width="2400" height="398"></a>
         <figcaption>Position error per frame: median over scenes (line) and middle half (band).</figcaption>
       </figure>
     </section>
 
     <section class="prose sim" id="sim" aria-labelledby="sim-h">
       <div class="wrap section-heading">
-        <p class="eyebrow">Analysis</p>
-        <h2 id="sim-h">Re-aim simulation</h2>
-        <p>A 2D camera follows a planned path in 24-frame chunks. Adjust the motion gain, direction error, and measurement noise to compare World model, Re-aim, and Re-aim + RGC.</p>
+        <p class="eyebrow"><span class="section-number">05</span> Simulation</p>
+        <h2 id="sim-h">Try the motion model</h2>
+        <p>A 2D camera follows a planned path in 24-frame chunks. Adjust the motion gain, direction error, and measurement noise to compare World model, Re-Aim, and Re-Aim + RGC.</p>
       </div>
       <div class="wrap-wide">
         <div class="sim-presets" role="radiogroup" aria-label="Kind of model"></div>
@@ -249,8 +264,8 @@
             </div>
             <div class="sim-toggles" role="group" aria-label="Show or hide">
               <button class="sim-toggle" type="button" data-arm="open" aria-pressed="true"><i class="key key-open"></i>World model</button>
-              <button class="sim-toggle" type="button" data-arm="reaim" aria-pressed="true"><i class="key key-reaim"></i>Re-aim</button>
-              <button class="sim-toggle" type="button" data-arm="rgc" aria-pressed="true"><i class="key key-ours"></i>Re-aim + RGC</button>
+              <button class="sim-toggle" type="button" data-arm="reaim" aria-pressed="true"><i class="key key-reaim"></i>Re-Aim</button>
+              <button class="sim-toggle" type="button" data-arm="rgc" aria-pressed="true"><i class="key key-ours"></i>Re-Aim + RGC</button>
             </div>
             <p class="sim-note">2D simulation; distances are normalized by the planned path length.</p>
           </div>
@@ -280,10 +295,10 @@
       <div class="wrap citation-layout">
         <div><p class="eyebrow">BibTeX</p>
         <h2 id="bibtex">Citation</h2>
-        <p>Taking the Road Not Taken<br><span>CVPR 2027 submission · Anonymous authors</span></p></div>
+        <p>Re-Aim<br><span>CVPR 2027 submission · Anonymous authors</span></p></div>
         <div class="bib">
-          <pre><code id="bibtex-text">@inproceedings{anonymous2027road,
-  title     = {Taking the Road Not Taken: Correcting Trajectory Drift
+          <pre><code id="bibtex-text">@inproceedings{anonymous2027reaim,
+  title     = {{Re-Aim}: Correcting Trajectory Drift
                in Frozen Video World Models},
   author    = {Anonymous},
   booktitle = {Under review},
@@ -297,7 +312,7 @@
 
   <footer class="footer">
     <div class="wrap">
-      <a class="footer-brand" href="#top">Taking the Road Not Taken</a>
+      <a class="footer-brand" href="#top">Re-Aim</a>
       <p>Results and figures from the paper.</p>
     </div>
   </footer>
@@ -310,11 +325,11 @@
   <script src="assets/js/data.js"></script>
   <script src="assets/js/frames.js?v=1"></script>
   <script src="assets/js/videos.js"></script>
-  <script src="assets/js/common.js?v=high-res-1"></script>
-  <script src="assets/js/player.js?v=names-1"></script>
-  <script src="assets/js/sim.js?v=names-1"></script>
-  <script src="assets/js/results.js?v=names-1"></script>
-  <script src="assets/js/examples.js?v=names-1"></script>
-  <script src="assets/js/presentation.js?v=2"></script>
+  <script src="assets/js/common.js?v=reaim-2"></script>
+  <script src="assets/js/player.js?v=reaim-2"></script>
+  <script src="assets/js/sim.js?v=reaim-2"></script>
+  <script src="assets/js/results.js?v=reaim-2"></script>
+  <script src="assets/js/examples.js?v=reaim-2"></script>
+  <script src="assets/js/presentation.js?v=reaim-2"></script>
 </body>
 </html>

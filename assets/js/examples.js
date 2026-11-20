@@ -8,8 +8,8 @@
   const ROWS = [
     { key: "target", label: "Recording" },
     { key: "open", label: "World model" },
-    { key: "reaim", label: "Re-aim" },
-    { key: "ours", label: "Re-aim + RGC" },
+    { key: "reaim", label: "Re-Aim" },
+    { key: "ours", label: "Re-Aim + RGC" },
   ];
 
   D.examples.forEach((x, n) => {
@@ -28,11 +28,11 @@
     const over = img("ours", last, "w-over");
     el("span", { class: "wipe-line", "aria-hidden": "true" }, media);
     el("span", { class: "tag tag-open w-tag-l", text: x.model }, media);
-    el("span", { class: "tag tag-ours w-tag-r", text: "Re-aim + RGC" }, media);
+    el("span", { class: "tag tag-ours w-tag-r", text: "Re-Aim + RGC" }, media);
     const inset = el("figure", { class: "inset" }, media);
     const rec = setFrameImage(el("img", { alt: "", loading: "lazy", decoding: "async" }, inset), x.frames.target[last], 160);
     el("figcaption", { class: "tag tag-target", text: "Recording" }, inset);
-    const range = el("input", { class: "wipe-range", type: "range", min: 0, max: 100, value: 50, "aria-label": `Move the divider between ${x.model} and Re-aim + RGC` }, media);
+    const range = el("input", { class: "wipe-range", type: "range", min: 0, max: 100, value: 50, "aria-label": `Move the divider between ${x.model} and Re-Aim + RGC` }, media);
     range.addEventListener("input", () => media.style.setProperty("--cut", range.value + "%"));
 
     // frame chips
@@ -42,7 +42,7 @@
     const show = (f) => {
       setFrameImage(under, x.frames.open[f]); setFrameImage(over, x.frames.ours[f]); setFrameImage(rec, x.frames.target[f], 160);
       const label = `${x.model}, frame ${x.keyframes[f]}`;
-      under.alt = `${label}: World model`; over.alt = `${label}: Re-aim + RGC`; rec.alt = `${label}: recording at the planned pose`;
+      under.alt = `${label}: World model`; over.alt = `${label}: Re-Aim + RGC`; rec.alt = `${label}: recording at the planned pose`;
       chips.querySelectorAll("button").forEach((b, i) => b.setAttribute("aria-checked", String(i === f)));
     };
     x.keyframes.forEach((fr, i) => {
@@ -73,7 +73,7 @@
     });
 
     const e = x.errors;
-    el("p", { class: "ex-nums", html: `Scene ${x.scene}. Mean position error: <span class="r-open">World model: ${fmt(e.open)}</span>, <span class="r-reaim">Re-aim: ${fmt(e.reaim)}</span>, <span class="r-ours">Re-aim + RGC: ${fmt(e.ours)}</span>.` + (x.worse ? " Re-aim + RGC follows the plan until about frame 330, then runs past its end and loses the scene." : "") }, card);
+    el("p", { class: "ex-nums", html: `Scene ${x.scene}. Mean position error: <span class="r-open">World model: ${fmt(e.open)}</span>, <span class="r-reaim">Re-Aim: ${fmt(e.reaim)}</span>, <span class="r-ours">Re-Aim + RGC: ${fmt(e.ours)}</span>.` + (x.worse ? " Re-Aim + RGC follows the plan until about frame 330, then runs past its end and loses the scene." : "") }, card);
   });
 
   const filters = root.querySelector(".gallery-filters");

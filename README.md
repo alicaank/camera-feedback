@@ -1,6 +1,6 @@
-# Taking the Road Not Taken
+# Re-Aim
 
-Static page for "Taking the Road Not Taken: Correcting Trajectory Drift in Frozen Video World Models". No build step, no external requests: fonts, figures and data are all in this folder.
+Static page for "Re-Aim: Correcting Trajectory Drift in Frozen Video World Models". No build step, no external requests: fonts, figures and data are all in this folder.
 
 ## Deploy on GitHub Pages
 
@@ -21,19 +21,20 @@ To put the page under a `docs/` folder of the code repository instead, copy this
 
 ## What is on the page
 
-- **Rollout player** (top): seven scenes from the paper, selected with thumbnail tabs. Opens in a large wipe comparison with the recording inset; **All four views** shows the recording, World model, Re-aim and Re-aim + RGC together. Drag a path or use the arrow keys to scrub the trajectory, toggle paths in the legend, and choose **Fit paths** or **Focus plan**. Without videos it steps through frames 1, 120, 240, 360 and 480 of the paper's frame sheets. Figure traces have no timestamps, so marker timing is approximated by distance along each path; video entries use their measured per-frame camera positions.
-- **Comparison controls**: compare World model with Re-aim + RGC, or Re-aim with Re-aim + RGC. The displayed scene reduction updates to match the selected baseline. **Full screen** expands the demo on supported browsers; Escape returns to the page.
+- **Rollout player** (top): seven scenes from the paper, selected with thumbnail tabs. Opens in a large wipe comparison with the recording inset; **All four views** shows the recording, World model, Re-Aim and Re-Aim + RGC together. Drag a path or use the arrow keys to scrub the trajectory, toggle paths in the legend, and choose **Fit paths** or **Focus plan**. Without videos it steps through frames 1, 120, 240, 360 and 480 of the paper's frame sheets. Figure traces have no timestamps, so marker timing is approximated by distance along each path; video entries use their measured per-frame camera positions.
+- **Comparison controls**: compare World model with Re-Aim + RGC, or Re-Aim with Re-Aim + RGC. The displayed scene reduction updates to match the selected baseline. **Full screen** expands the demo on supported browsers; Escape returns to the page.
+- **Scene preview**: the opening comparison uses the same high-resolution frames and exported trajectories as the first interactive scene.
 - **Method overview**: three steps and an expandable paper figure.
-- **Examples**: all nine frame sheets, filtered by model or the failure case. Initially shows four cards; **Show all examples** reveals the rest. Drag across a frame to compare World model with Re-aim + RGC, pick the frame, or open all frames.
+- **Examples**: all nine frame sheets, filtered by model or the failure case. Initially shows four cards; **Show all examples** reveals the rest. Drag across a frame to compare World model with Re-Aim + RGC, pick the frame, or open all frames.
 - **Frame images**: supplied high-resolution JPEGs are preserved as originals. Responsive 160px and 640px previews keep thumbnails and smaller displays lightweight. Images retain their full field of view, with letterboxing where aspect ratios differ. The player loads frames as needed rather than downloading every scene on page load.
-- **Simulation**: a 2D simulation in the browser (`assets/js/sim.js`) comparing World model, Re-aim and Re-aim + RGC.
+- **Simulation**: a 2D simulation in the browser (`assets/js/sim.js`) comparing World model, Re-Aim and Re-Aim + RGC.
 - **Results chart** for all eight models, with selected benchmark mean reductions computed directly from the exported results, the full table behind "Show all numbers", and the error over time. Benchmark means are labelled separately from individual scene reductions.
 
 ## Adding the rollout videos
 
 The page is ready for the full videos; they live on the machine that ran the evaluation, so they are added there:
 
-1. Write a `videos.json` listing the scenes, each with its ViPE report and which scored arm is World model, Re-aim and Re-aim + RGC (format at the top of `paper/scripts/export_videos.py`).
+1. Write a `videos.json` listing the scenes, each with its ViPE report and which scored arm is World model, Re-Aim and Re-Aim + RGC (format at the top of `paper/scripts/export_videos.py`).
 2. Run `python paper/scripts/export_videos.py --page project_page --manifest videos.json --scorer <path to vipe_eval/score.py>`.
 3. Copy `assets/video/` and `assets/js/videos.js` back into this folder.
 
@@ -59,7 +60,7 @@ python3 scripts/import_high_res_frames.py /path/to/high-res-imgs.zip
 
 This checks that the archive matches all existing frame filenames, copies the original JPEGs without re-encoding, and generates the previews and `assets/js/frames.js` manifest. It requires Pillow. Load `frames.js` before `common.js` so the player and gallery can select the appropriate image resolution.
 
-After regenerating paper figure PNGs, run `python3 scripts/build_web_figures.py` to rebuild the SVG presentation copies. These preserve the PNGs as embedded images and replace only the legend labels with World model, Re-aim, and Re-aim + RGC. The website and figure viewer use these SVG copies.
+After regenerating paper figure PNGs, run `python3 scripts/build_web_figures.py` to rebuild the SVG presentation copies. These preserve the PNGs as embedded images and replace only the legend labels with World model, Re-Aim, and Re-Aim + RGC. The website and figure viewer use these SVG copies.
 
 ## Preview locally
 

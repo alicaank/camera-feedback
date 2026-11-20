@@ -2,9 +2,25 @@
 (function () {
   const art = document.querySelector(".hero-path-art");
   if (art && D.player.length) {
+    const scene = D.player[0];
+    const points = ["plan", "open", "ours"].flatMap((run) => scene.paths[run]);
+    const xs = points.map((point) => point[0]), ys = points.map((point) => point[1]);
+    const left = Math.min(...xs) - 65, top = Math.min(...ys) - 65;
+    art.setAttribute("viewBox", `${left} ${top} ${Math.max(...xs) - left + 65} ${Math.max(...ys) - top + 65}`);
     for (const run of ["plan", "open", "ours"]) {
-      art.appendChild(polyline(D.player[0].paths[run], `hero-art-${run}`));
+      art.appendChild(polyline(scene.paths[run], `hero-art-${run}`));
     }
+    for (const run of ["open", "ours"]) {
+      const [cx, cy] = scene.paths[run].at(-1);
+      el("svg:circle", { cx, cy, r: 9, class: `hero-endpoint hero-endpoint-${run}` }, art);
+    }
+    document.querySelectorAll("[data-hero-frame]").forEach((image) => {
+      setFrameImage(image, scene.frames[image.dataset.heroFrame].at(-1), 250);
+    });
+    document.querySelector("[data-hero-scene]").textContent = `${scene.model} · Scene ${scene.scene}`;
+    document.querySelector(".hero-preview figcaption a").addEventListener("click", () => {
+      document.querySelector("#watch .pick")?.click();
+    });
   }
   document.querySelectorAll("[data-model-count]").forEach((node) => { node.textContent = D.results.length; });
 
@@ -18,6 +34,13 @@
     el("strong", { text: `${ratio.toFixed(1)}×` }, item);
     el("span", { text: "lower mean position error" }, item);
     el("small", { text: `${fmt(result.arms.open.pos)} → ${fmt(result.arms.full.pos)} scene units` }, item);
+    const bars = el("div", { class: "benchmark-comparison", "aria-hidden": "true" }, item);
+    for (const [label, value] of [["World model", result.arms.open.pos], ["Re-Aim + RGC", result.arms.full.pos]]) {
+      const bar = el("div", { class: "benchmark-bar" }, bars);
+      el("span", { text: label }, bar);
+      const track = el("div", { class: "benchmark-bar-track" }, bar);
+      el("div", { class: "benchmark-bar-fill", style: `--bar-width:${100 * value / Math.max(result.arms.open.pos, result.arms.full.pos)}%` }, track);
+    }
   }
 
   const sectionLinks = [...document.querySelectorAll(".section-links a")];
